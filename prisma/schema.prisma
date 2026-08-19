@@ -1,0 +1,552 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum ProjectRole {
+  OWNER_ADMIN
+  PROJECT_MANAGER
+  INVENTORY_MANAGER
+  SITE_MANAGER
+  VIEWER
+}
+
+enum ProjectStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum MembershipStatus {
+  ACTIVE
+  REMOVED
+  PENDING
+}
+
+enum LandStatus {
+  HELD_OWNED
+  AVAILABLE
+  RESERVED
+  UNDER_DEVELOPMENT
+  SOLD
+}
+
+enum UnitStatus {
+  UNDER_CONSTRUCTION
+  AVAILABLE
+  RESERVED
+  ALLOCATED
+  SOLD
+  UNDER_MAINTENANCE
+}
+
+enum DevelopmentStatus {
+  PLANNED
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETE_PENDING_APPROVAL
+  COMPLETE
+}
+
+enum PhaseStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  DELAYED
+  COMPLETE
+}
+
+enum MilestoneStatus {
+  PENDING
+  DONE
+  OVERDUE
+}
+
+enum CommercialStatus {
+  RESERVED
+  ALLOCATED
+  SOLD
+  CANCELLED
+}
+
+enum PaymentStatus {
+  NOT_APPLICABLE
+  PART_PAYMENT
+  FULL_PAYMENT
+}
+
+enum AssetType {
+  LAND
+  UNIT
+}
+
+enum DocCategory {
+  TITLE
+  SURVEY
+  APPROVAL
+  PLAN
+  CONTRACT
+  PROGRESS_EVIDENCE
+  ALLOCATION_LETTER
+  PAYMENT_EVIDENCE
+  OTHER
+}
+
+enum LinkedType {
+  ESTATE
+  LAND
+  DEVELOPMENT
+  PHASE
+  UNIT
+  SALE
+  PAYMENT
+  PROGRESS_UPDATE
+  PROJECT
+}
+
+enum NotificationType {
+  MILESTONE_OVERDUE
+  BUDGET_OVERRUN
+  STALE_PROGRESS
+  PAYMENT_FOLLOW_UP
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  memberships          ProjectMembership[]
+  ownedProjects        Project[]            @relation("ProjectOwner")
+  passwordResetTokens  PasswordResetToken[]
+  recordedPayments     PaymentRecord[]      @relation("PaymentRecorder")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Restrict)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  ownerId     String
+  owner       User          @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  name        String
+  description String?
+  location    String?
+  coverImage  String?
+  status      ProjectStatus @default(ACTIVE)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  memberships     ProjectMembership[]
+  estates         Estate[]
+  lands           Land[]
+  developments    Development[]
+  buildings       Building[]
+  units           Unit[]
+  contractors     Contractor[]
+  buyers          BuyerContact[]
+  sales           SaleAllocation[]
+  documents       Document[]
+  activityLogs    StatusActivityLog[]
+  notifications   Notification[]
+  phases          Phase[]
+  milestones      Milestone[]
+  progressUpdates ProgressUpdate[]
+  spendRecords    SpendRecord[]
+  payments        PaymentRecord[]
+
+  @@index([ownerId])
+  @@index([status])
+}
+
+model ProjectMembership {
+  id           String           @id @default(cuid())
+  projectId    String
+  userId       String?
+  role         ProjectRole
+  status       MembershipStatus @default(ACTIVE)
+  invitedEmail String?
+  project      Project          @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  user         User?            @relation(fields: [userId], references: [id], onDelete: Restrict)
+  scopes       MembershipScope[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  @@index([projectId, status])
+  @@index([userId])
+  @@index([projectId, invitedEmail])
+}
+
+model MembershipScope {
+  id           String            @id @default(cuid())
+  membershipId String
+  estateId     String?
+  developmentId String?
+  membership   ProjectMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  estate       Estate?           @relation(fields: [estateId], references: [id], onDelete: Restrict)
+  development  Development?      @relation(fields: [developmentId], references: [id], onDelete: Restrict)
+
+  @@index([membershipId])
+}
+
+model Estate {
+  id          String   @id @default(cuid())
+  projectId   String
+  name        String
+  location    String?
+  description String?
+  project     Project  @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  lands       Land[]
+  developments Development[]
+  buildings   Building[]
+  units       Unit[]
+  scopes      MembershipScope[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+model Land {
+  id                 String      @id @default(cuid())
+  projectId          String
+  estateId           String?
+  size               Decimal?
+  location           String?
+  coordinates        Json?
+  titleStatus        String?
+  status             LandStatus  @default(HELD_OWNED)
+  previousStatus     LandStatus?
+  acquisitionSource  String?
+  acquisitionValue   Decimal?
+  acquisitionDate    DateTime?
+  notes              String?
+  project            Project     @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  estate             Estate?     @relation(fields: [estateId], references: [id], onDelete: Restrict)
+  developments       DevelopmentLand[]
+  units              Unit[]
+  sales              SaleAllocation[]
+  createdAt          DateTime    @default(now())
+  updatedAt          DateTime    @updatedAt
+
+  @@index([projectId, status])
+  @@index([estateId])
+}
+
+model Development {
+  id               String             @id @default(cuid())
+  projectId        String
+  estateId         String?
+  name             String
+  description      String?
+  plannedUnitCount Int?
+  startDate        DateTime?
+  targetDate       DateTime?
+  approvedBudget   Decimal?
+  status           DevelopmentStatus  @default(PLANNED)
+  progressPct      Int                @default(0)
+  project          Project            @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  estate           Estate?            @relation(fields: [estateId], references: [id], onDelete: Restrict)
+  lands            DevelopmentLand[]
+  phases           Phase[]
+  progressUpdates  ProgressUpdate[]
+  spendRecords     SpendRecord[]
+  contractors      DevelopmentContractor[]
+  buildings        Building[]
+  units            Unit[]
+  scopes           MembershipScope[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([projectId, status])
+  @@index([estateId])
+}
+
+model DevelopmentLand {
+  developmentId String
+  landId        String
+  projectId     String
+  development   Development @relation(fields: [developmentId], references: [id], onDelete: Restrict)
+  land          Land        @relation(fields: [landId], references: [id], onDelete: Restrict)
+
+  @@id([developmentId, landId])
+  @@index([projectId])
+}
+
+model Phase {
+  id              String      @id @default(cuid())
+  projectId       String
+  developmentId   String
+  name            String
+  targetDate      DateTime?
+  actualDate      DateTime?
+  status          PhaseStatus @default(NOT_STARTED)
+  weight          Int?
+  budget          Decimal?
+  progressPct     Int         @default(0)
+  development     Development @relation(fields: [developmentId], references: [id], onDelete: Restrict)
+  project         Project     @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  milestones      Milestone[]
+  progressUpdates ProgressUpdate[]
+  spendRecords    SpendRecord[]
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([projectId])
+  @@index([developmentId])
+}
+
+model Milestone {
+  id             String          @id @default(cuid())
+  projectId      String
+  phaseId        String
+  description    String
+  targetDate     DateTime?
+  completionDate DateTime?
+  status         MilestoneStatus @default(PENDING)
+  phase          Phase           @relation(fields: [phaseId], references: [id], onDelete: Restrict)
+  project        Project         @relation(fields: [projectId], references: [id], onDelete: Restrict)
+
+  @@index([projectId])
+  @@index([phaseId, status])
+  @@index([targetDate])
+}
+
+model ProgressUpdate {
+  id            String   @id @default(cuid())
+  projectId     String
+  developmentId String?
+  phaseId       String?
+  progressPct   Int
+  note          String?
+  issuesRisks   String?
+  createdBy     String
+  createdAt     DateTime @default(now())
+  development   Development? @relation(fields: [developmentId], references: [id], onDelete: Restrict)
+  phase         Phase?       @relation(fields: [phaseId], references: [id], onDelete: Restrict)
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  documents     Document[]
+
+  @@index([projectId])
+  @@index([developmentId])
+  @@index([phaseId])
+}
+
+model SpendRecord {
+  id            String   @id @default(cuid())
+  projectId     String
+  developmentId String?
+  phaseId       String?
+  amount        Decimal
+  date          DateTime
+  category      String?
+  reference     String?
+  createdBy     String
+  createdAt     DateTime @default(now())
+  development   Development? @relation(fields: [developmentId], references: [id], onDelete: Restrict)
+  phase         Phase?       @relation(fields: [phaseId], references: [id], onDelete: Restrict)
+  project       Project      @relation(fields: [projectId], references: [id], onDelete: Restrict)
+
+  @@index([projectId])
+  @@index([developmentId])
+  @@index([phaseId])
+}
+
+model Contractor {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  contact   String?
+  role      String?
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  links     DevelopmentContractor[]
+
+  @@index([projectId])
+}
+
+model DevelopmentContractor {
+  developmentId String
+  contractorId  String
+  phaseId       String?
+  projectId     String
+  development   Development @relation(fields: [developmentId], references: [id], onDelete: Restrict)
+  contractor    Contractor  @relation(fields: [contractorId], references: [id], onDelete: Restrict)
+
+  @@id([developmentId, contractorId])
+  @@index([projectId])
+}
+
+model Building {
+  id            String   @id @default(cuid())
+  projectId     String
+  estateId      String?
+  developmentId String?
+  name          String
+  status        String?
+  project       Project  @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  estate        Estate?  @relation(fields: [estateId], references: [id], onDelete: Restrict)
+  development   Development? @relation(fields: [developmentId], references: [id], onDelete: Restrict)
+  units         Unit[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+model Unit {
+  id             String      @id @default(cuid())
+  projectId      String
+  estateId       String?
+  developmentId  String?
+  buildingId     String?
+  landId         String?
+  unitRef        String
+  type           String?
+  size           Decimal?
+  status         UnitStatus  @default(UNDER_CONSTRUCTION)
+  previousStatus UnitStatus?
+  project        Project     @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  estate         Estate?     @relation(fields: [estateId], references: [id], onDelete: Restrict)
+  development    Development? @relation(fields: [developmentId], references: [id], onDelete: Restrict)
+  building       Building?   @relation(fields: [buildingId], references: [id], onDelete: Restrict)
+  land           Land?       @relation(fields: [landId], references: [id], onDelete: Restrict)
+  sales          SaleAllocation[]
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@unique([projectId, unitRef])
+  @@index([projectId, status])
+  @@index([estateId])
+  @@index([developmentId])
+}
+
+model BuyerContact {
+  id        String   @id @default(cuid())
+  projectId String
+  name      String
+  phone     String?
+  email     String?
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  sales     SaleAllocation[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([projectId])
+}
+
+model SaleAllocation {
+  id                 String           @id @default(cuid())
+  projectId          String
+  assetType          AssetType
+  unitId             String?
+  landId             String?
+  buyerId            String?
+  agreedValue        Decimal
+  totalPaid          Decimal          @default(0)
+  isOverpaid         Boolean          @default(false)
+  commercialStatus   CommercialStatus @default(RESERVED)
+  paymentStatus      PaymentStatus    @default(NOT_APPLICABLE)
+  assignedUserId     String?
+  cancellationReason String?
+  notes              String?
+  followUpDate       DateTime?
+  project            Project          @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  unit               Unit?            @relation(fields: [unitId], references: [id], onDelete: Restrict)
+  land               Land?            @relation(fields: [landId], references: [id], onDelete: Restrict)
+  buyer              BuyerContact?    @relation(fields: [buyerId], references: [id], onDelete: Restrict)
+  payments           PaymentRecord[]
+  documents          Document[]
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+
+  @@index([projectId, commercialStatus])
+  @@index([projectId, paymentStatus])
+  @@index([unitId])
+  @@index([landId])
+}
+
+model PaymentRecord {
+  id            String    @id @default(cuid())
+  projectId     String
+  saleId        String
+  amount        Decimal
+  paymentDate   DateTime
+  method        String?
+  reference     String?
+  note          String?
+  recordedBy    String
+  recorder      User      @relation("PaymentRecorder", fields: [recordedBy], references: [id], onDelete: Restrict)
+  editableUntil DateTime
+  deletedAt     DateTime?
+  deletedBy     String?
+  deletedReason String?
+  sale          SaleAllocation @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  createdAt     DateTime  @default(now())
+
+  @@index([projectId])
+  @@index([saleId, deletedAt])
+}
+
+model Document {
+  id               String      @id @default(cuid())
+  projectId        String
+  linkedType       LinkedType
+  linkedId         String
+  category         DocCategory @default(OTHER)
+  fileKey          String
+  description      String?
+  uploadedBy       String
+  project          Project     @relation(fields: [projectId], references: [id], onDelete: Restrict)
+  progressUpdateId String?
+  progressUpdate   ProgressUpdate? @relation(fields: [progressUpdateId], references: [id], onDelete: Restrict)
+  saleId           String?
+  sale             SaleAllocation? @relation(fields: [saleId], references: [id], onDelete: Restrict)
+  createdAt        DateTime    @default(now())
+
+  @@index([projectId, linkedType, linkedId])
+}
+
+model StatusActivityLog {
+  id         String   @id @default(cuid())
+  projectId  String
+  recordType String
+  recordId   String
+  action     String
+  oldValue   Json?
+  newValue   Json?
+  changedBy  String
+  timestamp  DateTime @default(now())
+  project    Project  @relation(fields: [projectId], references: [id], onDelete: Restrict)
+
+  @@index([projectId, timestamp])
+  @@index([recordType, recordId])
+}
+
+model Notification {
+  id         String           @id @default(cuid())
+  projectId  String
+  type       NotificationType
+  recordType String
+  recordId   String
+  triggeredAt DateTime        @default(now())
+  readAt     DateTime?
+  project    Project          @relation(fields: [projectId], references: [id], onDelete: Restrict)
+
+  @@unique([type, recordType, recordId])
+  @@index([projectId, type])
+}

@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background: #f8f9ff;
+  color: #191c20;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+input[type="date"],
+input[type="number"] {
+  color-scheme: light;
+}

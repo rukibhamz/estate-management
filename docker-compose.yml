@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: estateflow
+      POSTGRES_PASSWORD: estateflow
+      POSTGRES_DB: estateflow
+    ports:
+      - "5432:5432"
+    volumes:
+      - estateflow_pg:/var/lib/postgresql/data
+
+volumes:
+  estateflow_pg:
