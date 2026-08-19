@@ -13,7 +13,7 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-2xl bg-white shadow-card",
+        "rounded-2xl bg-white text-ink shadow-card",
         accent === "blue" && "ring-1 ring-chart-blue/80",
         accent === "green" && "ring-1 ring-forest-mint",
         accent === "amber" && "ring-1 ring-chart-beige",
@@ -26,5 +26,5 @@ export function Card({
 }
 
 export function CardBody({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cn("p-6", className)}>{children}</div>;
+  return <div className={cn("p-5", className)}>{children}</div>;
 }

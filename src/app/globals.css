@@ -2,10 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Rebuild token pass: forest green utilities */
-
 :root {
   color-scheme: light;
+  --brand-canvas: 242 241 236;
+  --brand-forest: 31 107 74;
+  --brand-on-forest: 255 255 255;
+  --brand-forest-dark: color-mix(in srgb, rgb(var(--brand-forest)) 72%, #000);
+  --brand-forest-ink: 31 107 74;
+  --brand-forest-soft: color-mix(in srgb, rgb(var(--brand-forest)) 16%, #fff);
+  --brand-forest-mint: color-mix(in srgb, rgb(var(--brand-forest)) 22%, #fff);
+  --brand-ink: 26 28 25;
+  --brand-ink-muted: 90 94 89;
 }
 
 html,
@@ -14,8 +21,8 @@ body {
 }
 
 body {
-  background: #f2f1ec;
-  color: #1a1c19;
+  background: rgb(var(--brand-canvas));
+  color: rgb(var(--brand-ink));
 }
 
 summary::-webkit-details-marker {
@@ -25,4 +32,10 @@ summary::-webkit-details-marker {
 input[type="date"],
 input[type="number"] {
   color-scheme: light;
+}
+
+/* Dark brand fills always use white type/icons, even when a parent sets text-ink. */
+.bg-forest,
+.bg-forest-dark {
+  color: #fff;
 }

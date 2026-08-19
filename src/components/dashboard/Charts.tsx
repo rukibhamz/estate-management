@@ -1,6 +1,6 @@
 import { formatNairaCompact } from "@/core/money";
 
-const BAR_MAX = 200;
+const BAR_MAX = 152;
 
 export function SalesBarChart({
   series,
@@ -19,11 +19,11 @@ export function SalesBarChart({
         return (
           <div key={row.label} className="flex min-w-0 flex-1 flex-col items-center justify-end">
             {active ? (
-              <div className="mb-2 w-max rounded-xl bg-forest px-2.5 py-1.5 text-center text-[11px] leading-tight text-white shadow-modal">
+              <div className="mb-1.5 w-max rounded-xl bg-forest px-2.5 py-1 text-center text-[11px] font-medium leading-tight text-white shadow-modal">
                 {formatNairaCompact(row.amount)}
               </div>
             ) : (
-              <div className="mb-2 h-[30px]" aria-hidden />
+              <div className="mb-1.5 h-[26px]" aria-hidden />
             )}
             <div
               className={
@@ -38,7 +38,7 @@ export function SalesBarChart({
                   : undefined,
               }}
             />
-            <span className="mt-3 text-label-sm text-ink-muted">{row.label}</span>
+            <span className="mt-2 text-label-sm text-ink-muted">{row.label}</span>
           </div>
         );
       })}
@@ -57,8 +57,8 @@ export function CostDonut({
   let offset = 0;
 
   return (
-    <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center">
-      <div className="relative h-44 w-44 shrink-0">
+    <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
+      <div className="relative h-40 w-40 shrink-0">
         <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
           <circle cx="70" cy="70" r={radius} fill="none" stroke="#F2F1EC" strokeWidth="18" />
           {slices.map((slice) => {
@@ -86,7 +86,7 @@ export function CostDonut({
           <p className="text-headline-md tabular-nums text-ink">{formatNairaCompact(total)}</p>
         </div>
       </div>
-      <ul className="w-full space-y-3 text-body-md">
+      <ul className="w-full space-y-2 text-body-md">
         {slices.map((slice) => (
           <li key={slice.label} className="flex items-center justify-between gap-3">
             <span className="flex items-center gap-2">

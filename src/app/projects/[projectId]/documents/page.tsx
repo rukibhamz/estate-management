@@ -62,7 +62,7 @@ export default async function DocumentsPage({
                   {doc.linkedType} · {doc.category}
                 </p>
               </div>
-              <a className="text-body-md font-medium text-forest underline" href={signedDownloadPath(doc.fileKey)}>
+              <a className="text-body-md font-medium text-forest-ink underline" href={signedDownloadPath(doc.fileKey)}>
                 Download
               </a>
             </CardBody>

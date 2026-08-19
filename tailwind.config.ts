@@ -5,18 +5,21 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        canvas: "#F2F1EC",
+        canvas: "rgb(var(--brand-canvas) / <alpha-value>)",
         forest: {
-          DEFAULT: "#1F6B4A",
-          dark: "#163D2C",
-          ink: "#0F241C",
-          mint: "#D8EBDD",
-          soft: "#EAF4EE",
+          DEFAULT: "rgb(var(--brand-forest) / <alpha-value>)",
+          dark: "var(--brand-forest-dark)",
+          ink: "rgb(var(--brand-forest-ink) / <alpha-value>)",
+          mint: "var(--brand-forest-mint)",
+          soft: "var(--brand-forest-soft)",
         },
-        "forest-ink": "#0F241C",
-        "forest-dark": "#163D2C",
-        "forest-soft": "#EAF4EE",
-        "forest-mint": "#D8EBDD",
+        "forest-ink": "rgb(var(--brand-forest-ink) / <alpha-value>)",
+        "forest-dark": "var(--brand-forest-dark)",
+        "forest-soft": "var(--brand-forest-soft)",
+        "forest-mint": "var(--brand-forest-mint)",
+        on: {
+          forest: "rgb(var(--brand-on-forest) / <alpha-value>)",
+        },
         surface: {
           DEFAULT: "#F2F1EC",
           dim: "#d8dae0",
@@ -29,8 +32,8 @@ const config: Config = {
           gray: "#EEEEE9",
         },
         ink: {
-          DEFAULT: "#1A1C19",
-          muted: "#6B706A",
+          DEFAULT: "rgb(var(--brand-ink) / <alpha-value>)",
+          muted: "rgb(var(--brand-ink-muted) / <alpha-value>)",
           inverse: "#eff0f6",
         },
         outline: {
@@ -39,18 +42,18 @@ const config: Config = {
           subtle: "#E8E8E2",
         },
         precision: {
-          DEFAULT: "#163D2C",
-          navy: "#163D2C",
-          container: "#1F6B4A",
+          DEFAULT: "var(--brand-forest-dark)",
+          navy: "var(--brand-forest-dark)",
+          container: "rgb(var(--brand-forest) / <alpha-value>)",
           tint: "#4e5e81",
           inverse: "#b6c6ee",
-          950: "#0F241C",
+          950: "rgb(var(--brand-forest-ink) / <alpha-value>)",
         },
         success: {
-          DEFAULT: "#1F6B4A",
-          600: "#1F6B4A",
-          container: "#D8EBDD",
-          on: "#163D2C",
+          DEFAULT: "rgb(var(--brand-forest) / <alpha-value>)",
+          600: "rgb(var(--brand-forest) / <alpha-value>)",
+          container: "var(--brand-forest-mint)",
+          on: "rgb(var(--brand-forest-ink) / <alpha-value>)",
         },
         warning: {
           DEFAULT: "#C4A574",

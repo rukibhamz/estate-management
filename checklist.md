@@ -2,10 +2,11 @@
 
 Living build tracker. Design system: **Modern Minimalist** inspired by the attached property dashboard — cream canvas `#F2F1EC`, forest green `#1F6B4A`, icon rail, 24px cards, pill search, Plus Jakarta Sans.
 
-**Last updated:** 2026-08-19 19:25 — UI fix: titles, charts, inner pages  
+**Last updated:** 2026-08-19 19:45 — design refresh closed; checklist synced  
 **Stack:** Next.js 15 App Router · TypeScript · Tailwind · Prisma · SQLite (local) · Auth.js credentials  
 **Dev server:** http://localhost:3000  
-**Seed login:** `owner@estateflow.dev` / `Password123!`
+**Seed login:** `owner@estateflow.dev` / `Password123!`  
+**Seed project:** `seed-project-1` (Lekki Waterside)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked
 
@@ -13,38 +14,47 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked
 
 ## Design refresh (this pass)
 
-Applied the attached dashboard mock to tokens, shell, and project home. Domain data stays EstateFlow (₦, units, allocations) — not a generic property-maintenance product.
+**Status:** `[x]` done
+
+Applied the attached property-dashboard mock to tokens, shell, project home, and inner modules. Domain data stays EstateFlow (₦, units, allocations) — not a generic property-maintenance product.
 
 ### Tasks
-- [x] Cream canvas, forest green, 24px radius, soft card shadow (no heavy borders)
-- [x] Full labeled sidebar, collapsible to the icon rail (persisted)
+- [x] Cream canvas `#F2F1EC`, forest green `#1F6B4A`, 24px radius, soft card shadow (no heavy borders)
+- [x] Full labeled sidebar, collapsible to the icon rail (`localStorage` `estateflow.sidebar.collapsed`)
 - [x] Greeting header + pill search + message/bell
-- [x] KPI cards (Total Property / Number of Sales / Total Sales)
-- [x] Weekday sales bar chart + cost donut
+- [x] KPI cards (Total Property / Number of Sales / Total Sales) with distinct icons
+- [x] Weekday sales bar chart (pixel heights, compact ₦ tooltip) + cost donut (compact ₦ center)
 - [x] Last transactions + attention (overdue milestones)
 - [x] Re-seed payments/spend so charts have data
-- [x] Page titles live in the shell (no duplicate “Hello, Ada!” / H1 on inner pages)
-- [x] Sales bars use % height so they are not clipped; donut uses compact ₦
-- [x] Apply the same card/list density to Inventory, Developments, Sales, Reports
+- [x] Page titles live in the shell (dashboard greeting only; no duplicate H1s)
+- [x] Inner modules restyled to the same cards/filters: Inventory, Developments, Sales, Reports, Documents, Team, Audit, Alerts, Profile, New project
+- [x] `AppShell` lifted to `src/app/projects/layout.tsx` so nav survives `/projects` ↔ project routes
+- [x] Dashboard nav item uses explicit forest fill `#1F6B4A` (Tailwind `bg-forest-ink` was not in the CSS, so the active item was white-on-white)
+- [x] Sidebar row spacing restored (44px rows, 8px gaps)
+- [x] Transaction timestamps formatted with fixed `Africa/Lagos` (`src/core/datetime.ts`) so server/browser strings match
 
 ---
 
 ## Runtime smoke (this session)
 
-Dev server Ready in 3.5s. Compiled routes and HTTP results:
+Dev server Ready in 3.5s. Routes hit in browser or HTTP this session:
 
 | Route | Result |
 |---|---|
 | `GET /` | 200 |
 | `GET /login` | 200 |
 | `POST /api/auth/callback/credentials` | 200 (seed owner signed in) |
-| `GET /projects` | 200 |
-| `GET /projects/seed-project-1` (dashboard) | 200 |
+| `GET /projects` | 200 (list + sidebar still shows Dashboard after last project) |
+| `GET /projects/seed-project-1` (dashboard) | 200 — KPIs, bars, donut, transactions |
 | `GET /projects/seed-project-1/inventory` | 200 |
 | `GET /projects/seed-project-1/developments` | 200 |
-| `GET /json/version` | 404 (browser extension noise, ignore) |
+| `GET /projects/seed-project-1/alerts` | 200 |
 
-Not yet hit in this session: sales, documents, reports, team, audit, alerts, profile, new project, register.
+`GET /json/version` 404 is browser-extension noise; ignore.
+
+Cursor’s in-editor browser injects `data-cursor-ref` before hydrate — that overlay is inspector noise, not an app bug. Dates/counts were still locked to deterministic strings.
+
+Not yet opened this session: sales, documents, reports, team, audit, profile, new project, register.
 
 ---
 
@@ -54,7 +64,7 @@ Not yet hit in this session: sales, documents, reports, team, audit, alerts, pro
 
 ### Tasks
 - [x] Scaffold Next.js app (App Router, TypeScript, Tailwind, ESLint)
-- [x] Design tokens + Plus Jakarta Sans / JetBrains Mono (Precision Executive)
+- [x] Design tokens + Plus Jakarta Sans / JetBrains Mono (now cream/forest mock; original Precision Executive navy retired)
 - [x] Prisma schema (MVP + QA-gate fields: `isOverpaid`, `previousStatus`, `Phase.progressPct`, `MembershipScope`, `Notification`, payment `deletedAt`, `Unit.landId`)
 - [x] Local SQLite + optional `docker-compose.yml` Postgres + `.env.example`
 - [x] Object storage helper (signed URLs, local `storage/` bucket)
@@ -137,7 +147,7 @@ Not yet hit in this session: sales, documents, reports, team, audit, alerts, pro
 
 ## Phase 4 — Sales, Allocation & Payments
 
-**Status:** `[x]` done (code); `[~]` UI smoke pending this session
+**Status:** `[x]` done (code); `[~]` UI smoke pending this session (sales screen not opened)
 
 ### Tasks
 - [x] BuyerContact CRUD
@@ -159,7 +169,7 @@ Not yet hit in this session: sales, documents, reports, team, audit, alerts, pro
 
 ## Phase 5 — Documents
 
-**Status:** `[x]` done (code); `[~]` UI smoke pending this session
+**Status:** `[x]` done (code); `[~]` UI smoke pending this session (documents screen not opened)
 
 ### Tasks
 - [x] Signed-URL upload; never public
@@ -189,8 +199,9 @@ Not yet hit in this session: sales, documents, reports, team, audit, alerts, pro
 - [x] Dashboard aggregates use `Decimal` string math (`src/core/money.ts`)
 - [x] Alerts upsert on unique `(type, recordType, recordId)`
 - [x] Viewer audit filtered by estate scope
-- [x] Dashboard smoke-tested (`/projects/seed-project-1` 200)
-- [ ] Reports / audit / alerts pages not opened in this browser session
+- [x] Dashboard smoke-tested (`/projects/seed-project-1` 200) — KPIs, bars, donut
+- [x] Alerts page opened this session (`/projects/seed-project-1/alerts` 200)
+- [ ] Reports / audit pages not opened in this browser session
 - [ ] 5k-row p95 timing not measured in CI
 
 ---
@@ -216,10 +227,11 @@ Not yet hit in this session: sales, documents, reports, team, audit, alerts, pro
 
 ## Open follow-ups
 
-- [ ] Restyle Inventory, Developments, Sales, Reports to the same card/list language as the dashboard
+Design refresh is closed. Remaining work is QA, data, and infra:
+
 - [ ] Playwright e2e: register → two projects → invite with different roles
 - [ ] Playwright RBAC isolation against real endpoints
-- [ ] Smoke remaining screens: Sales, Documents, Reports, Team, Audit, Alerts, Profile
+- [ ] Smoke remaining screens: Sales, Documents, Reports, Team, Audit, Profile, New project
 - [ ] Seed ~5,000 inventory rows and record dashboard p95
 - [ ] Run a disposable SQLite/Postgres restore per `docs/BACKUP.md`
 - [ ] Switch `DATABASE_URL` to Postgres when Docker Desktop is available

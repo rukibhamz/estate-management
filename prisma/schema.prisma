@@ -550,3 +550,17 @@ model Notification {
   @@unique([type, recordType, recordId])
   @@index([projectId, type])
 }
+
+model SystemBranding {
+  id             String   @id
+  appName        String
+  logoFileKey    String?
+  logoMime       String?
+  faviconFileKey String?
+  faviconMime    String?
+  colorPrimary   String
+  colorCanvas    String
+  colorInk       String
+  updatedAt      DateTime @updatedAt
+  updatedBy      String?
+}

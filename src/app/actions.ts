@@ -10,6 +10,7 @@ import * as developments from "@/server/developments";
 import * as sales from "@/server/sales";
 import { evaluateAlerts } from "@/server/alerts";
 import { uploadDocument } from "@/server/documents";
+import { updateSystemBranding } from "@/server/branding";
 import type { CommercialStatus, LinkedType, ProjectRole, UnitStatus } from "@prisma/client";
 
 function formString(form: FormData, key: string) {
@@ -274,4 +275,34 @@ export async function actionUpdateProfile(form: FormData): Promise<void> {
       currentPassword: formOpt(form, "currentPassword"),
     }),
   );
+}
+
+async function formImage(form: FormData, key: string) {
+  const file = form.get(key);
+  if (!(file instanceof File) || file.size === 0) return undefined;
+  return {
+    bytes: Buffer.from(await file.arrayBuffer()),
+    mime: file.type,
+    name: file.name,
+  };
+}
+
+export async function actionUpdateBranding(form: FormData): Promise<void> {
+  const user = await requireUser();
+  const logo = await formImage(form, "logo");
+  const favicon = await formImage(form, "favicon");
+  await run(() =>
+    updateSystemBranding(user.id, {
+      appName: formString(form, "appName"),
+      colorPrimary: formString(form, "colorPrimary"),
+      colorCanvas: formString(form, "colorCanvas"),
+      colorInk: formString(form, "colorInk"),
+      removeLogo: form.get("removeLogo") === "1",
+      removeFavicon: form.get("removeFavicon") === "1",
+      logo,
+      favicon,
+    }),
+  );
+  revalidatePath("/", "layout");
+  revalidatePath("/settings/branding");
 }

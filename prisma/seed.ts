@@ -215,6 +215,18 @@ async function main() {
     },
   });
 
+  await prisma.systemBranding.upsert({
+    where: { id: "default" },
+    update: {},
+    create: {
+      id: "default",
+      appName: "EstateFlow",
+      colorPrimary: "#1F6B4A",
+      colorCanvas: "#F2F1EC",
+      colorInk: "#1A1C19",
+    },
+  });
+
   console.log("Seed complete. Login: owner@estateflow.dev / Password123!");
   console.log({ owner: owner.email, pm: pm.email, im: im.email, site: site.email, viewer: viewer.email });
 }

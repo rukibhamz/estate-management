@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { authSession } from "@/lib/guard";
 import { redirect } from "next/navigation";
-import { BrandMark } from "@/components/BrandMark";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export default async function HomePage() {
   const session = await authSession();
@@ -10,10 +10,7 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-canvas">
       <header className="mx-auto flex max-w-container items-center justify-between px-6 py-6">
-        <span className="flex items-center gap-2 text-headline-md text-ink">
-          <BrandMark className="h-7 w-7 text-forest" />
-          EstateFlow
-        </span>
+        <BrandLogo showName className="text-headline-md" markClassName="h-7 w-7" />
         <div className="flex gap-3">
           <Link href="/login" className="rounded-full px-4 py-2 text-body-md text-ink-muted hover:text-ink">
             Sign in

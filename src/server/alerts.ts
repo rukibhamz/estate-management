@@ -53,3 +53,24 @@ export async function evaluateAlerts(projectId: string) {
     orderBy: { triggeredAt: "desc" },
   });
 }
+
+export async function listProjectAlerts(projectId: string) {
+  const [alerts, count] = await Promise.all([
+    prisma.notification.findMany({
+      where: { projectId },
+      orderBy: { triggeredAt: "desc" },
+      take: 12,
+    }),
+    prisma.notification.count({ where: { projectId } }),
+  ]);
+  return {
+    count,
+    alerts: alerts.map((alert) => ({
+      id: alert.id,
+      type: alert.type,
+      recordType: alert.recordType,
+      recordId: alert.recordId,
+      triggeredAt: alert.triggeredAt.toISOString(),
+    })),
+  };
+}

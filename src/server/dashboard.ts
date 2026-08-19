@@ -3,13 +3,14 @@ import { requireCapability } from "@/lib/guard";
 import { addMoney, moneyString, subMoney } from "@/core/money";
 import { formatLagosDateTime } from "@/core/datetime";
 import { isMilestoneOverdue } from "@/core/alerts";
+import { getSystemBranding } from "@/server/branding";
 import type { AssetType, PaymentStatus } from "@prisma/client";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 export async function getDashboard(userId: string, projectId: string) {
   await requireCapability(userId, projectId, "report.read");
-  const [units, lands, developments, sales, milestones, payments, unitTotal, landTotal] = await Promise.all([
+  const [units, lands, developments, sales, milestones, payments, unitTotal, landTotal, branding] = await Promise.all([
     prisma.unit.groupBy({ by: ["status"], where: { projectId }, _count: true }),
     prisma.land.groupBy({ by: ["status"], where: { projectId }, _count: true }),
     prisma.development.findMany({
@@ -28,6 +29,7 @@ export async function getDashboard(userId: string, projectId: string) {
     }),
     prisma.unit.count({ where: { projectId } }),
     prisma.land.count({ where: { projectId } }),
+    getSystemBranding(),
   ]);
 
   const agreed = addMoney(sales.map((s) => s.agreedValue.toString()));
@@ -51,7 +53,7 @@ export async function getDashboard(userId: string, projectId: string) {
   }
 
   const spendCats = [
-    { label: "Construction", color: "#1F6B4A", amount: 0 },
+    { label: "Construction", color: branding.colorPrimary, amount: 0 },
     { label: "Approvals", color: "#E4D4B8", amount: 0 },
     { label: "Consultants", color: "#C9D7EA", amount: 0 },
     { label: "Contingency", color: "#D5CBE8", amount: 0 },

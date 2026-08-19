@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/guard";
 import { prisma } from "@/lib/prisma";
-import { AppShell } from "@/components/AppShell";
+import { AuthenticatedShell } from "@/components/AuthenticatedShell";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Field, Input } from "@/components/ui/Field";
 import { Button } from "@/components/ui/Button";
@@ -11,7 +11,7 @@ export default async function ProfilePage() {
   const user = await prisma.user.findUnique({ where: { id: sessionUser.id } });
 
   return (
-    <AppShell userName={sessionUser.name ?? "User"}>
+    <AuthenticatedShell>
       <Card className="max-w-lg">
         <CardBody>
           <form action={actionUpdateProfile} className="space-y-3">
@@ -28,6 +28,6 @@ export default async function ProfilePage() {
           </form>
         </CardBody>
       </Card>
-    </AppShell>
+    </AuthenticatedShell>
   );
 }

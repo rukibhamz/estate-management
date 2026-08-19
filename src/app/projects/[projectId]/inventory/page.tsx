@@ -31,7 +31,7 @@ export default async function InventoryPage({
 
   return (
     <>
-      <form className="mb-6 grid gap-3 rounded-2xl bg-white p-4 shadow-card md:grid-cols-4">
+      <form className="mb-6 grid gap-3 rounded-2xl bg-white p-4 text-ink shadow-card md:grid-cols-4">
         <Field label="Estate">
           <Select name="estateId" defaultValue={filters.estateId}>
             <option value="">All</option>
@@ -155,8 +155,8 @@ export default async function InventoryPage({
         ))}
       </div>
 
-      <div className="mt-8 hidden overflow-x-auto rounded-2xl bg-white shadow-card md:block">
-        <table className="w-full text-left text-body-md">
+      <div className="mt-8 hidden overflow-x-auto rounded-2xl bg-white text-ink shadow-card md:block">
+        <table className="w-full text-left text-body-md text-ink">
           <thead className="border-b border-outline-subtle/70 text-label-sm uppercase text-ink-muted">
             <tr>
               <th className="px-4 py-3">Ref</th>

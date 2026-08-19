@@ -1,5 +1,7 @@
+"use client";
+
 import { Card, CardBody } from "./ui/Card";
-import { BrandMark } from "./BrandMark";
+import { BrandLogo } from "./BrandLogo";
 import type { ReactNode } from "react";
 
 export function AuthFrame({
@@ -14,9 +16,13 @@ export function AuthFrame({
   return (
     <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
       <div className="w-full max-w-md">
-        <div className="mb-6 flex flex-col items-center text-forest">
-          <BrandMark className="h-10 w-10" />
-          <p className="mt-2 text-headline-md text-ink">EstateFlow</p>
+        <div className="mb-6 flex flex-col items-center text-forest-ink">
+          <BrandLogo
+            stacked
+            showName
+            markClassName="h-10 w-10"
+            nameClassName="mt-0 text-headline-md font-semibold text-ink"
+          />
         </div>
         <Card>
           <CardBody>
