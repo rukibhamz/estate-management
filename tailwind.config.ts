@@ -1,11 +1,13 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   theme: {
     extend: {
       colors: {
         canvas: "rgb(var(--brand-canvas) / <alpha-value>)",
+        paper: "rgb(var(--brand-paper) / <alpha-value>)",
         forest: {
           DEFAULT: "rgb(var(--brand-forest) / <alpha-value>)",
           dark: "var(--brand-forest-dark)",
@@ -21,15 +23,15 @@ const config: Config = {
           forest: "rgb(var(--brand-on-forest) / <alpha-value>)",
         },
         surface: {
-          DEFAULT: "#F2F1EC",
-          dim: "#d8dae0",
-          bright: "#F2F1EC",
+          DEFAULT: "#F4EDE3",
+          dim: "#E0D4C4",
+          bright: "#F4EDE3",
           lowest: "#ffffff",
-          low: "#F7F6F2",
-          container: "#eceef3",
-          high: "#e7e8ee",
-          highest: "#e1e2e8",
-          gray: "#EEEEE9",
+          low: "#F3EBE0",
+          container: "#EDE3D4",
+          high: "#E8DCCB",
+          highest: "#E2D4C2",
+          gray: "#EFE6D8",
         },
         ink: {
           DEFAULT: "rgb(var(--brand-ink) / <alpha-value>)",
@@ -37,16 +39,16 @@ const config: Config = {
           inverse: "#eff0f6",
         },
         outline: {
-          DEFAULT: "#75777f",
-          variant: "#DDDDD6",
-          subtle: "#E8E8E2",
+          DEFAULT: "#8A7D6E",
+          variant: "#E0D4C4",
+          subtle: "#E8DCCB",
         },
         precision: {
           DEFAULT: "var(--brand-forest-dark)",
           navy: "var(--brand-forest-dark)",
           container: "rgb(var(--brand-forest) / <alpha-value>)",
-          tint: "#4e5e81",
-          inverse: "#b6c6ee",
+          tint: "#7A6A55",
+          inverse: "#E8D5B8",
           950: "rgb(var(--brand-forest-ink) / <alpha-value>)",
         },
         success: {
@@ -66,8 +68,8 @@ const config: Config = {
         },
         chart: {
           beige: "#E4D4B8",
-          blue: "#C9D7EA",
-          purple: "#D5CBE8",
+          blue: "#D8CFC0",
+          purple: "#E2D3C4",
         },
       },
       fontFamily: {
@@ -95,8 +97,8 @@ const config: Config = {
         container: "1440px",
       },
       boxShadow: {
-        card: "0 10px 30px rgba(15, 36, 28, 0.04)",
-        modal: "0 18px 50px rgba(15, 36, 28, 0.12)",
+        card: "0 8px 24px rgba(80, 55, 30, 0.06)",
+        modal: "0 20px 50px rgba(92, 58, 28, 0.14)",
       },
     },
   },

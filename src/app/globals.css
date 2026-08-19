@@ -4,25 +4,89 @@
 
 :root {
   color-scheme: light;
-  --brand-canvas: 242 241 236;
+  --brand-canvas: 244 237 227;
+  --brand-paper: 255 255 255;
   --brand-forest: 31 107 74;
   --brand-on-forest: 255 255 255;
-  --brand-forest-dark: color-mix(in srgb, rgb(var(--brand-forest)) 72%, #000);
+  --brand-forest-dark: color-mix(in srgb, rgb(var(--brand-forest)) 72%, #3d2914);
   --brand-forest-ink: 31 107 74;
-  --brand-forest-soft: color-mix(in srgb, rgb(var(--brand-forest)) 16%, #fff);
-  --brand-forest-mint: color-mix(in srgb, rgb(var(--brand-forest)) 22%, #fff);
-  --brand-ink: 26 28 25;
-  --brand-ink-muted: 90 94 89;
+  --brand-forest-soft: color-mix(in srgb, rgb(var(--brand-forest)) 14%, #f6efe4);
+  --brand-forest-mint: color-mix(in srgb, rgb(var(--brand-forest)) 20%, #f6efe4);
+  --brand-ink: 31 27 22;
+  --brand-ink-muted: 107 96 82;
+  --app-bg-image:
+    radial-gradient(1100px 640px at 6% -18%, rgba(196, 165, 116, 0.55), transparent 58%),
+    radial-gradient(920px 560px at 98% -4%, color-mix(in srgb, rgb(var(--brand-forest)) 42%, transparent), transparent 56%),
+    radial-gradient(760px 460px at 52% 112%, rgba(196, 165, 116, 0.28), transparent 52%);
+}
+
+html.dark {
+  color-scheme: dark;
+  --brand-canvas: 18 16 14;
+  --brand-paper: 36 32 28;
+  --brand-ink: 245 239 230;
+  --brand-ink-muted: 168 156 142;
+  --brand-forest-ink: 176 214 190;
+  --brand-forest-soft: color-mix(in srgb, rgb(var(--brand-forest)) 22%, #161412);
+  --brand-forest-mint: color-mix(in srgb, rgb(var(--brand-forest)) 30%, #161412);
+  --app-bg-image:
+    radial-gradient(1100px 640px at 6% -18%, rgba(196, 165, 116, 0.2), transparent 58%),
+    radial-gradient(920px 560px at 98% -4%, color-mix(in srgb, rgb(var(--brand-forest)) 42%, transparent), transparent 56%),
+    radial-gradient(760px 460px at 52% 112%, rgba(196, 165, 116, 0.12), transparent 52%);
 }
 
 html,
-body {
+.bg-app {
+  background-color: rgb(var(--brand-canvas));
+  background-image: var(--app-bg-image);
+  background-attachment: fixed;
+}
+
+html {
   min-height: 100%;
 }
 
 body {
-  background: rgb(var(--brand-canvas));
+  min-height: 100%;
+  background: transparent;
   color: rgb(var(--brand-ink));
+}
+
+@layer utilities {
+  .surface-glass {
+    background-color: rgb(255 255 255 / 0.4);
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    border: 1px solid rgb(255 255 255 / 0.55);
+  }
+
+  html.dark .surface-glass {
+    background-color: rgb(255 255 255 / 0.08);
+    border-color: rgb(255 255 255 / 0.12);
+  }
+
+  .field-control {
+    background-color: #fff;
+    border: 1px solid rgb(80 55 30 / 0.16);
+  }
+
+  .field-control:focus,
+  .field-control:focus-visible {
+    background-color: #fff;
+    border-color: rgb(var(--brand-forest) / 0.45);
+  }
+
+  html.dark .field-control {
+    background-color: rgb(255 255 255 / 0.07);
+    border-color: rgb(255 255 255 / 0.16);
+    color: rgb(var(--brand-ink));
+  }
+
+  html.dark .field-control:focus,
+  html.dark .field-control:focus-visible {
+    background-color: rgb(255 255 255 / 0.12);
+    border-color: rgb(var(--brand-forest) / 0.55);
+  }
 }
 
 summary::-webkit-details-marker {
@@ -31,11 +95,83 @@ summary::-webkit-details-marker {
 
 input[type="date"],
 input[type="number"] {
-  color-scheme: light;
+  color-scheme: inherit;
 }
 
 /* Dark brand fills always use white type/icons, even when a parent sets text-ink. */
 .bg-forest,
 .bg-forest-dark {
   color: #fff;
+}
+
+.bg-paper {
+  background-color: rgb(var(--brand-paper) / 0.92);
+}
+
+html.dark .bg-surface-low,
+html.dark .bg-surface-high,
+html.dark .bg-surface-gray {
+  background-color: rgb(255 255 255 / 0.08);
+}
+
+html.dark .bg-critical-container {
+  background-color: rgb(196 92 92 / 0.22);
+}
+
+html.dark .ring-outline-subtle {
+  --tw-ring-color: rgb(255 255 255 / 0.16);
+}
+
+html.dark .border-outline-subtle,
+html.dark .divide-outline-subtle\/60,
+html.dark .border-outline-subtle\/70,
+html.dark .border-outline-subtle\/80 {
+  border-color: rgb(255 255 255 / 0.12);
+}
+
+.btn-secondary {
+  background-color: rgb(255 255 255 / 0.92);
+  color: rgb(var(--brand-ink));
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.08);
+}
+
+.btn-secondary:hover {
+  background-color: var(--brand-forest-soft);
+}
+
+html.dark .btn-secondary {
+  background-color: rgb(255 255 255 / 0.12);
+  color: rgb(var(--brand-ink));
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.18);
+}
+
+html.dark .btn-secondary:hover {
+  background-color: rgb(255 255 255 / 0.2);
+}
+
+.btn-ghost:hover {
+  background-color: rgb(255 255 255 / 0.7);
+  color: rgb(var(--brand-ink));
+}
+
+html.dark .btn-ghost:hover {
+  background-color: rgb(255 255 255 / 0.1);
+}
+
+.btn-danger {
+  background-color: #f8e4e4;
+  color: #b42318;
+}
+
+.btn-danger:hover {
+  background-color: rgb(196 92 92 / 0.2);
+}
+
+html.dark .btn-danger {
+  background-color: rgb(196 92 92 / 0.22);
+  color: #f0b4b4;
+}
+
+html.dark .btn-danger:hover {
+  background-color: rgb(196 92 92 / 0.32);
 }

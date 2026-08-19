@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import { getSystemBranding, toPublicBranding } from "@/server/branding";
 import { DEFAULT_BRANDING, brandingCssVars, type PublicBranding } from "@/core/branding";
+import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme-script";
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -43,7 +44,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { public: branding, css } = await loadBranding();
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
+      </head>
       <body className={`${plusJakarta.variable} ${jetbrains.variable} font-sans antialiased`} suppressHydrationWarning>
         <style dangerouslySetInnerHTML={{ __html: css }} />
         <Providers branding={branding}>{children}</Providers>

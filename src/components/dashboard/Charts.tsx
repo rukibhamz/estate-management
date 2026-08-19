@@ -29,7 +29,7 @@ export function SalesBarChart({
               className={
                 active
                   ? "w-full rounded-t-full bg-forest"
-                  : "w-full rounded-t-full bg-[#E8E8E2]"
+                  : "w-full rounded-t-full bg-forest-soft"
               }
               style={{
                 height: barH,
@@ -60,7 +60,7 @@ export function CostDonut({
     <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
       <div className="relative h-40 w-40 shrink-0">
         <svg viewBox="0 0 140 140" className="h-full w-full -rotate-90">
-          <circle cx="70" cy="70" r={radius} fill="none" stroke="#F2F1EC" strokeWidth="18" />
+          <circle cx="70" cy="70" r={radius} fill="none" stroke="rgb(var(--brand-canvas))" strokeWidth="18" />
           {slices.map((slice) => {
             const len = (slice.amount / total) * circ;
             const dash = `${len} ${circ - len}`;

@@ -30,10 +30,10 @@ export function KpiCard({
       <CardBody className="p-4">
         <div className="flex items-start justify-between">
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-forest-soft text-forest-ink">
-            <Icon size={16} />
+            <Icon size={16} className="stroke-current" />
           </span>
           <span className="text-ink-muted/50" aria-hidden>
-            <MoreHorizontal size={16} />
+            <MoreHorizontal size={16} className="stroke-current" />
           </span>
         </div>
         <p className="mt-3 text-body-md text-ink-muted">{label}</p>

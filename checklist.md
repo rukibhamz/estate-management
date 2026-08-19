@@ -1,8 +1,8 @@
 # EstateFlow — Phase Checklist
 
-Living build tracker. Design system: **Modern Minimalist** inspired by the attached property dashboard — cream canvas `#F2F1EC`, forest green `#1F6B4A`, icon rail, 24px cards, pill search, Plus Jakarta Sans.
+Living build tracker. Design system: **warm modern** — sand canvas `#F4EDE3`, ivory paper cards, forest green `#1F6B4A`, Plus Jakarta Sans.
 
-**Last updated:** 2026-08-19 19:45 — design refresh closed; checklist synced  
+**Last updated:** 2026-08-19 20:40 — frosted glass canvas; light/dark toggle between search and alerts  
 **Stack:** Next.js 15 App Router · TypeScript · Tailwind · Prisma · SQLite (local) · Auth.js credentials  
 **Dev server:** http://localhost:3000  
 **Seed login:** `owner@estateflow.dev` / `Password123!`  
@@ -12,47 +12,64 @@ Legend: `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked
 
 ---
 
-## Design refresh (this pass)
+## Design refresh
 
 **Status:** `[x]` done
 
-Applied the attached property-dashboard mock to tokens, shell, project home, and inner modules. Domain data stays EstateFlow (₦, units, allocations) — not a generic property-maintenance product.
+Applied the property-dashboard mock, then warmed the palette and lifted cards so they no longer match the page background.
 
 ### Tasks
-- [x] Cream canvas `#F2F1EC`, forest green `#1F6B4A`, 24px radius, soft card shadow (no heavy borders)
-- [x] Full labeled sidebar, collapsible to the icon rail (`localStorage` `estateflow.sidebar.collapsed`)
-- [x] Greeting header + pill search + message/bell
-- [x] KPI cards (Total Property / Number of Sales / Total Sales) with distinct icons
-- [x] Weekday sales bar chart (pixel heights, compact ₦ tooltip) + cost donut (compact ₦ center)
+- [x] Cream/sand canvas, forest green `#1F6B4A`, 24px radius, soft card shadow
+- [x] Full labeled sidebar, collapsible (`localStorage` `estateflow.sidebar.collapsed`)
+- [x] Greeting header + pill search + theme toggle + alerts bell
+- [x] KPI cards with distinct icons
+- [x] Weekday sales bar chart + cost donut
 - [x] Last transactions + attention (overdue milestones)
-- [x] Re-seed payments/spend so charts have data
-- [x] Page titles live in the shell (dashboard greeting only; no duplicate H1s)
-- [x] Inner modules restyled to the same cards/filters: Inventory, Developments, Sales, Reports, Documents, Team, Audit, Alerts, Profile, New project
-- [x] `AppShell` lifted to `src/app/projects/layout.tsx` so nav survives `/projects` ↔ project routes
-- [x] Dashboard nav item uses explicit forest fill `#1F6B4A` (Tailwind `bg-forest-ink` was not in the CSS, so the active item was white-on-white)
-- [x] Sidebar row spacing restored (44px rows, 8px gaps)
-- [x] Transaction timestamps formatted with fixed `Africa/Lagos` (`src/core/datetime.ts`) so server/browser strings match
+- [x] Page titles live in the shell
+- [x] Inner modules on the same cards/filters
+- [x] `AppShell` in `src/app/projects/layout.tsx` so nav survives project routes
+- [x] White type/icons on forest fills (nav, search, ₦ tooltip, primary buttons)
+- [x] Warmer sand/ivory surfaces (canvas `#F4EDE3`, paper `#FFFCF7`, brown-tinted shadows)
+- [x] Cards use glass surfaces so they sit above the canvas
+- [x] Frosted glass page background (blur over gold/forest washes)
+- [x] Light/dark mode toggle between search and alerts (`estateflow.theme`)
+
+---
+
+## Workspace branding & marketing
+
+**Status:** `[x]` done (MVP)
+
+Install-wide branding for Owner/Admin; public landing inspired by the property-management marketing layout.
+
+### Tasks
+- [x] `SystemBranding` model + `/settings/branding` (name, logo, favicon, brand/canvas/ink)
+- [x] Theme CSS variables injected in root layout; favicon/logo via `/api/branding/*`
+- [x] Sidebar **Branding** link gated to Owner/Admin
+- [x] Alerts bell popup in the header (count badge, recent items, view all)
+- [x] Public landing: pill nav, laptop product mock, quote, metadata footer
+- [x] Landing nav: single logo on the left; Sign in as a pill button
+- [x] Branding page split into preview / identity / palette / marks
 
 ---
 
 ## Runtime smoke (this session)
 
-Dev server Ready in 3.5s. Routes hit in browser or HTTP this session:
+Dev server at http://localhost:3000. Routes hit in browser or HTTP this session:
 
 | Route | Result |
 |---|---|
-| `GET /` | 200 |
+| `GET /` | 200 — marketing landing |
 | `GET /login` | 200 |
 | `POST /api/auth/callback/credentials` | 200 (seed owner signed in) |
-| `GET /projects` | 200 (list + sidebar still shows Dashboard after last project) |
+| `GET /projects` | 200 |
 | `GET /projects/seed-project-1` (dashboard) | 200 — KPIs, bars, donut, transactions |
 | `GET /projects/seed-project-1/inventory` | 200 |
 | `GET /projects/seed-project-1/developments` | 200 |
 | `GET /projects/seed-project-1/alerts` | 200 |
+| `GET /settings/branding` | 200 (Owner/Admin) |
 
 `GET /json/version` 404 is browser-extension noise; ignore.
-
-Cursor’s in-editor browser injects `data-cursor-ref` before hydrate — that overlay is inspector noise, not an app bug. Dates/counts were still locked to deterministic strings.
 
 Not yet opened this session: sales, documents, reports, team, audit, profile, new project, register.
 
@@ -64,20 +81,20 @@ Not yet opened this session: sales, documents, reports, team, audit, profile, ne
 
 ### Tasks
 - [x] Scaffold Next.js app (App Router, TypeScript, Tailwind, ESLint)
-- [x] Design tokens + Plus Jakarta Sans / JetBrains Mono (now cream/forest mock; original Precision Executive navy retired)
-- [x] Prisma schema (MVP + QA-gate fields: `isOverpaid`, `previousStatus`, `Phase.progressPct`, `MembershipScope`, `Notification`, payment `deletedAt`, `Unit.landId`)
+- [x] Design tokens + Plus Jakarta Sans / JetBrains Mono
+- [x] Prisma schema (MVP + QA-gate fields)
 - [x] Local SQLite + optional `docker-compose.yml` Postgres + `.env.example`
 - [x] Object storage helper (signed URLs, local `storage/` bucket)
-- [x] CI: lint → typecheck → unit tests → build (`.github/workflows/ci.yml`)
+- [x] CI: lint → typecheck → unit tests → build
 - [x] `assertProjectAccess` + Spec §4.6 permission matrix
 - [x] Exhaustive permission matrix unit tests (183 cells)
 
 ### QA Gate
 - [x] `npm run build` succeeds with zero TS errors
-- [x] Permission matrix unit tests: every Spec §4.6 cell covered, all pass (`src/core/permissions.matrix.test.ts`)
-- [x] CI workflow added (runs on push/PR)
+- [x] Permission matrix unit tests pass
+- [x] CI workflow added
 - [x] Migration applies cleanly (`prisma/migrations/20260819180118_init`)
-- [x] `npm test` — 190 passed
+- [x] `npm test` — 194 passed (incl. branding contrast helpers)
 - [x] `next lint` — no warnings or errors
 
 ---
@@ -92,14 +109,14 @@ Not yet opened this session: sales, documents, reports, team, audit, profile, ne
 - [x] Invite member, assign role, remove, change role
 - [x] Project archive (`status = ARCHIVED`)
 - [x] Ownership transfer; ≥1 Owner/Admin invariant
-- [x] Auth UI (modern minimal)
+- [x] Auth UI
 
 ### QA Gate
-- [x] Domain: last Owner/Admin protected in `src/server/projects.ts`
-- [x] Cross-project: `assertProjectAccess` denies missing membership
-- [x] Archive is status-only (no child deletes)
-- [x] Audit actions: `MEMBER_INVITE`, `MEMBER_ROLE_CHANGE`, `MEMBER_REMOVE`, `PROJECT_ARCHIVE`, `OWNERSHIP_TRANSFER`
-- [x] Login + project list smoke-tested in browser (this session)
+- [x] Last Owner/Admin protected
+- [x] Cross-project access denied without membership
+- [x] Archive is status-only
+- [x] Audit actions for members / archive / transfer
+- [x] Login + project list smoke-tested
 - [ ] Playwright e2e (register → 2 projects → invite) not automated yet
 
 ---
@@ -112,14 +129,13 @@ Not yet opened this session: sales, documents, reports, team, audit, profile, ne
 - [x] CRUD Estate, Land, Building (optional), Unit
 - [x] Status changes write `STATUS_CHANGE` audit
 - [x] Search/filter: project, estate, type, status, unitRef
-- [x] Land ↔ Development join table (`DevelopmentLand`)
+- [x] Land ↔ Development join table
 
 ### QA Gate
-- [x] Unit with `buildingId = null` allowed (optional building select)
+- [x] Unit with `buildingId = null` allowed
 - [x] Every level carries `projectId`
 - [x] Viewer writes denied; Site Manager scoped writes in access tests
-- [x] `STATUS_CHANGE` audit on unit/land status mutation
-- [x] Inventory page smoke-tested (`/projects/seed-project-1/inventory` 200)
+- [x] Inventory page smoke-tested
 
 ---
 
@@ -131,76 +147,67 @@ Not yet opened this session: sales, documents, reports, team, audit, profile, ne
 - [x] Development CRUD, ≥1 Land, optional Estate
 - [x] Phases, Milestones, Progress Updates
 - [x] SpendRecord + budget variance
-- [x] `rollupDevelopmentProgress` after phase mutations
-- [x] Two-step completion (propose / approve) generating remaining units
+- [x] Progress rollup after phase mutations
+- [x] Two-step completion (propose / approve)
 - [x] Contractor reference records
 
 ### QA Gate
-- [x] Weights 1,2,3 progress 100/50/0 → `progressPct === 33` (`src/core/domain.test.ts`)
+- [x] Weighted progress in `domain.test.ts`
 - [x] Overrun flag when spend > budget
-- [x] PM cannot `approveCompletion` (capability matrix)
-- [x] Unit generation remainder + single-land `landId` in `approveCompletion`
-- [x] Overdue milestones (`Africa/Lagos`) in `isMilestoneOverdue`
-- [x] Developments page smoke-tested (`/projects/seed-project-1/developments` 200)
+- [x] PM cannot approve completion
+- [x] Overdue milestones (`Africa/Lagos`)
+- [x] Developments page smoke-tested
 
 ---
 
 ## Phase 4 — Sales, Allocation & Payments
 
-**Status:** `[x]` done (code); `[~]` UI smoke pending this session (sales screen not opened)
+**Status:** `[x]` done (code); `[~]` UI smoke pending
 
 ### Tasks
 - [x] BuyerContact CRUD
 - [x] SaleAllocation state machine
 - [x] PaymentRecord 24h edit window + Owner/Admin override
-- [x] `recalculatePaymentStatus` + `isOverpaid` + `totalPaid`
-- [x] Cancellation restores `previousStatus`
+- [x] Payment status + overpaid flag
+- [x] Cancellation restores previous status
 
 ### QA Gate
-- [x] Reserve → part → full → overpay flagged (`src/core/domain.test.ts`)
+- [x] Reserve → part → full → overpay in unit tests
 - [x] IM cannot reopen SOLD; Owner/Admin with reason can
-- [x] Cancel restores `previousStatus`
-- [x] Refund with note; without note rejected
-- [x] 24h window in `canEditPayment`
-- [x] Sale XOR `unitId` / `landId`
+- [x] Refund requires a note
 - [ ] Sales page not opened in this browser session
 
 ---
 
 ## Phase 5 — Documents
 
-**Status:** `[x]` done (code); `[~]` UI smoke pending this session (documents screen not opened)
+**Status:** `[x]` done (code); `[~]` UI smoke pending
 
 ### Tasks
 - [x] Signed-URL upload; never public
-- [x] Link to Estate, Land, Development, Phase, Unit, Sale, Payment, ProgressUpdate
-- [x] Category, uploader, timestamp, description
-- [x] Access inherits linked-record permission (scoped viewer)
+- [x] Link to estate / land / development / phase / unit / sale / payment / progress
+- [x] Access inherits linked-record permission
 
 ### QA Gate
-- [x] `/api/files/[...key]` returns 403 without valid token
-- [x] Scoped viewer blocked in `getDocumentDownload`
-- [x] `listDocuments` is a single `findMany`
+- [x] Files API 403 without valid token
+- [x] Scoped viewer blocked on download
 - [ ] Documents page not opened in this browser session
 
 ---
 
 ## Phase 6 — Dashboards, Reporting, Notifications, Audit
 
-**Status:** `[x]` done — dashboard rebuilt to the attached mock
+**Status:** `[x]` done (dashboard); `[~]` remaining screens unsmoked
 
 ### Tasks
-- [x] Project dashboard KPIs (₦ financial display)
+- [x] Project dashboard KPIs
 - [x] Filterable reports
-- [x] `evaluateAlerts()` (overdue, overrun, stale) + `/api/cron/alerts`
-- [x] Audit history scoped by role + MembershipScope
+- [x] Alerts evaluate + cron + header popup
+- [x] Audit history scoped by role
 
 ### QA Gate
-- [x] Dashboard aggregates use `Decimal` string math (`src/core/money.ts`)
-- [x] Alerts upsert on unique `(type, recordType, recordId)`
-- [x] Viewer audit filtered by estate scope
-- [x] Dashboard smoke-tested (`/projects/seed-project-1` 200) — KPIs, bars, donut
-- [x] Alerts page opened this session (`/projects/seed-project-1/alerts` 200)
+- [x] Dashboard smoke-tested
+- [x] Alerts page opened this session
 - [ ] Reports / audit pages not opened in this browser session
 - [ ] 5k-row p95 timing not measured in CI
 
@@ -208,33 +215,33 @@ Not yet opened this session: sales, documents, reports, team, audit, profile, ne
 
 ## Phase 7 — Hardening & Launch Readiness
 
-**Status:** `[x]` done (MVP)
+**Status:** `[x]` done (MVP code); `[~]` launch QA still open
 
 ### Tasks
-- [x] Responsive: hamburger nav &lt;768px; inventory cards on mobile; 12-col dashboard
-- [x] RBAC matrix against core functions (endpoint Playwright suite still open)
+- [x] Responsive hamburger &lt;768px; inventory cards on mobile
 - [x] Backup/restore note (`docs/BACKUP.md`)
 - [x] FR-01..FR-37 traceability table below
 
 ### QA Gate
 - [x] FR table mapped
-- [x] Mutating servers call `requireCapability` + `writeAuditLog` on state changes
-- [x] Mobile breakpoints in `AppShell` + inventory cards
+- [x] Mutating servers call `requireCapability` + audit on state changes
 - [ ] Full Playwright RBAC isolation suite
 - [ ] Backup restore actually run (doc only)
 
 ---
 
-## Open follow-ups
+## What’s left
 
-Design refresh is closed. Remaining work is QA, data, and infra:
+Product MVP is in place. Remaining work is QA, data scale, and infra:
 
-- [ ] Playwright e2e: register → two projects → invite with different roles
-- [ ] Playwright RBAC isolation against real endpoints
-- [ ] Smoke remaining screens: Sales, Documents, Reports, Team, Audit, Profile, New project
-- [ ] Seed ~5,000 inventory rows and record dashboard p95
-- [ ] Run a disposable SQLite/Postgres restore per `docs/BACKUP.md`
-- [ ] Switch `DATABASE_URL` to Postgres when Docker Desktop is available
+1. **Playwright e2e** — register → two projects → invite with different roles
+2. **Playwright RBAC** — isolation against real endpoints
+3. **Smoke remaining screens** — Sales, Documents, Reports, Team, Audit, Profile, New project, Register
+4. **Scale check** — seed ~5,000 inventory rows and record dashboard p95
+5. **Backup drill** — run a disposable SQLite/Postgres restore per `docs/BACKUP.md`
+6. **Postgres** — switch `DATABASE_URL` when Docker Desktop is available
+
+Optional polish (not blocking launch QA): live color preview on the branding form as you pick, custom logo on the landing mockup.
 
 ---
 
@@ -275,7 +282,7 @@ Design refresh is closed. Remaining work is QA, data, and infra:
 | FR-31 | listDocuments single findMany | `documents.ts` | [x] |
 | FR-32 | Dashboard aggregates | dashboard 200 this session | [x] |
 | FR-33 | Reports + filters | `/reports` | [x] |
-| FR-34 | Alerts | `evaluateAlerts` | [x] |
+| FR-34 | Alerts | `evaluateAlerts` + header popup | [x] |
 | FR-35 | Scoped audit | `listAudit` | [x] |
 | FR-36 | Responsive 375 / 768 | AppShell + inventory cards | [x] |
 | FR-37 | Backup restore documented | `docs/BACKUP.md` | [x] |

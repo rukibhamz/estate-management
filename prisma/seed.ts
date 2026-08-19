@@ -222,8 +222,8 @@ async function main() {
       id: "default",
       appName: "EstateFlow",
       colorPrimary: "#1F6B4A",
-      colorCanvas: "#F2F1EC",
-      colorInk: "#1A1C19",
+      colorCanvas: "#F4EDE3",
+      colorInk: "#1F1B16",
     },
   });
 

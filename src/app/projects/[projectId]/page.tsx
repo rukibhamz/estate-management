@@ -116,7 +116,7 @@ export default async function ProjectDashboard({
                     <li key={item.id} className="flex items-center justify-between gap-3 py-0.5">
                       <div className="flex items-center gap-3">
                         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-surface-low text-forest-ink">
-                          <Icon size={16} />
+                          <Icon size={16} className="stroke-current" />
                         </span>
                         <div>
                           <p className="text-body-lg">{item.description}</p>

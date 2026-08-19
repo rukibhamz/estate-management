@@ -66,9 +66,9 @@ export function AlertsBell({ projectId }: { projectId: string }) {
         aria-label="Alerts"
         aria-expanded={open}
         onClick={() => setOpen((current) => !current)}
-        className="relative flex h-12 w-12 items-center justify-center rounded-full bg-white text-ink shadow-card"
+        className="surface-glass relative flex h-12 w-12 items-center justify-center rounded-full text-ink shadow-card"
       >
-        <Bell size={18} />
+        <Bell size={18} className="stroke-current" />
         {count > 0 ? (
           <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-critical-error px-1 text-[10px] font-semibold leading-none text-white">
             {count > 9 ? "9+" : count}
@@ -76,7 +76,7 @@ export function AlertsBell({ projectId }: { projectId: string }) {
         ) : null}
       </button>
       {open ? (
-        <div className="absolute right-0 z-40 mt-2 w-[min(calc(100vw-2rem),22rem)] overflow-hidden rounded-2xl bg-white text-ink shadow-modal">
+        <div className="surface-glass absolute right-0 z-40 mt-2 w-[min(calc(100vw-2rem),22rem)] overflow-hidden rounded-2xl text-ink shadow-modal">
           <div className="flex items-center justify-between gap-3 border-b border-outline-subtle px-4 py-3">
             <p className="text-body-md font-semibold text-ink">Alerts</p>
             <Link

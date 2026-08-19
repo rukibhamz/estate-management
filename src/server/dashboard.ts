@@ -55,8 +55,8 @@ export async function getDashboard(userId: string, projectId: string) {
   const spendCats = [
     { label: "Construction", color: branding.colorPrimary, amount: 0 },
     { label: "Approvals", color: "#E4D4B8", amount: 0 },
-    { label: "Consultants", color: "#C9D7EA", amount: 0 },
-    { label: "Contingency", color: "#D5CBE8", amount: 0 },
+    { label: "Consultants", color: "#D8CFC0", amount: 0 },
+    { label: "Contingency", color: "#E2D3C4", amount: 0 },
   ];
   for (const development of developments) {
     for (const spend of development.spendRecords) {

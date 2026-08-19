@@ -14,7 +14,7 @@ export function AuthFrame({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
+    <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md">
         <div className="mb-6 flex flex-col items-center text-forest-ink">
           <BrandLogo

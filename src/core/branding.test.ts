@@ -29,7 +29,7 @@ describe("branding", () => {
       colorCanvas: "#FFFFFF",
       colorInk: "#FFFFFF",
     });
-    expect(css).toContain("--brand-on-forest:26 28 25");
-    expect(css).toContain("--brand-ink:26 28 25");
+    expect(css).toContain("--brand-on-forest:31 27 22");
+    expect(css).toContain("--brand-ink:31 27 22");
   });
 });

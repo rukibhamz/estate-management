@@ -53,7 +53,7 @@ export default async function DevelopmentsPage({
               <Input name="approvedBudget" />
             </Field>
             <Field label="Land parcels">
-              <select name="landIds" multiple className="h-24 w-full rounded-2xl bg-surface-low p-3 text-body-md outline-none focus:bg-white focus:ring-2 focus:ring-forest/20">
+              <select name="landIds" multiple className="field-control h-24 w-full rounded-2xl p-3 text-body-md outline-none focus:ring-2 focus:ring-forest/25">
                 {lands.map((l) => (
                   <option key={l.id} value={l.id}>
                     {l.location ?? l.id.slice(0, 8)}

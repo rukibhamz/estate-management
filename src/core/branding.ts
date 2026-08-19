@@ -3,8 +3,8 @@ export const BRANDING_ID = "default";
 export const DEFAULT_BRANDING = {
   appName: "EstateFlow",
   colorPrimary: "#1F6B4A",
-  colorCanvas: "#F2F1EC",
-  colorInk: "#1A1C19",
+  colorCanvas: "#F4EDE3",
+  colorInk: "#1F1B16",
 } as const;
 
 const HEX = /^#[0-9A-Fa-f]{6}$/;
@@ -40,8 +40,10 @@ export function brandingCssVars(input: {
   const canvas = input.colorCanvas;
   const ink = readableOn(canvas, input.colorInk);
   const forestInk = darkenToContrast(input.colorPrimary, WHITE);
-  const muted = darkenToContrast(mixHex(ink, canvas, 0.7), WHITE, 4.5);
-  return `:root{--brand-canvas:${hexToRgb(canvas)};--brand-forest:${hexToRgb(input.colorPrimary)};--brand-on-forest:${hexToRgb(onColor(input.colorPrimary))};--brand-forest-dark:color-mix(in srgb,rgb(var(--brand-forest)) 72%,#000);--brand-forest-ink:${hexToRgb(forestInk)};--brand-forest-soft:color-mix(in srgb,rgb(var(--brand-forest)) 16%,#fff);--brand-forest-mint:color-mix(in srgb,rgb(var(--brand-forest)) 22%,#fff);--brand-ink:${hexToRgb(ink)};--brand-ink-muted:${hexToRgb(muted)};}`;
+  const muted = darkenToContrast(mixHex(ink, canvas, 0.68), WHITE, 4.5);
+  const paper = WHITE;
+  const cream = "#F6EFE4";
+  return `:root{--brand-canvas:${hexToRgb(canvas)};--brand-paper:${hexToRgb(paper)};--brand-forest:${hexToRgb(input.colorPrimary)};--brand-on-forest:${hexToRgb(onColor(input.colorPrimary))};--brand-forest-dark:color-mix(in srgb,rgb(var(--brand-forest)) 72%,#3d2914);--brand-forest-ink:${hexToRgb(forestInk)};--brand-forest-soft:color-mix(in srgb,rgb(var(--brand-forest)) 14%,${cream});--brand-forest-mint:color-mix(in srgb,rgb(var(--brand-forest)) 20%,${cream});--brand-ink:${hexToRgb(ink)};--brand-ink-muted:${hexToRgb(muted)};}`;
 }
 
 export function hexToRgb(hex: string) {

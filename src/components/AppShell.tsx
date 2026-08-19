@@ -7,6 +7,7 @@ import { Search } from "lucide-react";
 import { SidebarNav } from "./SidebarNav";
 import { BrandLogo } from "./BrandLogo";
 import { AlertsBell } from "./AlertsBell";
+import { ThemeToggle } from "./ThemeToggle";
 import { cn } from "@/lib/cn";
 import { projectIdFromPath } from "@/lib/projectPath";
 import type { ReactNode } from "react";
@@ -25,7 +26,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   alerts: { title: "Alerts", subtitle: "Overdue work, overruns, and stale progress." },
   new: { title: "New project", subtitle: "You become the Owner/Admin." },
   profile: { title: "Profile", subtitle: "Your name and password." },
-  branding: { title: "Branding", subtitle: "Logo, favicon, and colors for this workspace." },
+  branding: { title: "Branding", subtitle: "Workspace name, logo, favicon, and theme colors." },
 };
 
 function headerCopy(pathname: string, firstName: string, projectId?: string, projectName?: string) {
@@ -118,7 +119,7 @@ export function AppShell({
   }
 
   return (
-    <div className="min-h-screen bg-canvas text-ink">
+    <div className="min-h-screen text-ink">
       <SidebarNav
         projectId={resolvedProjectId}
         projectName={resolvedProjectName}
@@ -128,7 +129,7 @@ export function AppShell({
         onToggle={toggle}
       />
       <div className={cn("transition-[padding] duration-200", collapsed ? "md:pl-[148px]" : "md:pl-[292px]")}>
-        <header className="sticky top-0 z-20 bg-canvas/85 px-4 py-3 backdrop-blur md:px-6">
+        <header className="sticky top-0 z-20 bg-app px-4 pb-4 pt-6 md:px-6 md:pt-8">
           <div className="mx-auto flex max-w-container flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex items-start justify-between gap-3">
               <Link href="/projects" className="mt-1 text-forest-ink md:hidden">
@@ -148,16 +149,17 @@ export function AppShell({
                 <input
                   name="unitRef"
                   placeholder="Search Anything..."
-                  className="h-12 w-full rounded-full bg-white py-2 pl-5 pr-14 text-body-md text-ink shadow-card outline-none placeholder:text-ink-muted"
+                  className="surface-glass h-12 w-full rounded-full py-2 pl-5 pr-14 text-body-md text-ink shadow-card outline-none placeholder:text-ink-muted"
                 />
                 <button
                   type="submit"
                   className="absolute right-1.5 top-1.5 flex h-9 w-9 items-center justify-center rounded-full bg-forest text-white"
                   aria-label="Search"
                 >
-                  <Search size={16} />
+                  <Search size={16} className="stroke-current" />
                 </button>
               </form>
+              <ThemeToggle />
               {resolvedProjectId ? <AlertsBell projectId={resolvedProjectId} /> : null}
             </div>
           </div>
@@ -171,10 +173,10 @@ export function AppShell({
 function MobileNav({ projectId, isSystemAdmin }: { projectId?: string; isSystemAdmin: boolean }) {
   return (
     <details className="relative md:hidden">
-      <summary className={cn("list-none cursor-pointer rounded-full bg-white px-4 py-2 text-body-md text-ink shadow-card")}>
+      <summary className={cn("surface-glass list-none cursor-pointer rounded-full px-4 py-2 text-body-md text-ink shadow-card")}>
         Menu
       </summary>
-      <div className="absolute right-0 z-30 mt-2 w-56 rounded-2xl bg-white p-2 text-ink shadow-modal">
+      <div className="surface-glass absolute right-0 z-30 mt-2 w-56 rounded-2xl p-2 text-ink shadow-modal">
         <Link href="/projects" className="block rounded-xl px-3 py-2 text-body-md text-ink">
           Projects
         </Link>

@@ -9,14 +9,17 @@ export function ColorField({ name, defaultValue }: { name: string; defaultValue:
   const submitted = isHexColor(value) ? value.toUpperCase() : defaultValue;
 
   return (
-    <div className="flex items-center gap-2">
-      <input
-        type="color"
-        value={submitted}
-        onChange={(event) => setValue(event.target.value.toUpperCase())}
-        className="h-11 w-14 cursor-pointer rounded-2xl border-0 bg-transparent"
-        aria-label={`${name} picker`}
-      />
+    <div className="overflow-hidden rounded-2xl bg-canvas ring-1 ring-black/[0.06] dark:ring-white/10">
+      <label className="relative block h-16 cursor-pointer overflow-hidden">
+        <span className="absolute inset-0" style={{ background: submitted }} />
+        <input
+          type="color"
+          value={submitted}
+          onChange={(event) => setValue(event.target.value.toUpperCase())}
+          className="absolute inset-0 h-[200%] w-[200%] -translate-x-1/4 -translate-y-1/4 cursor-pointer opacity-0"
+          aria-label={`${name} picker`}
+        />
+      </label>
       <Input
         value={value}
         onChange={(event) => setValue(event.target.value)}
@@ -24,7 +27,7 @@ export function ColorField({ name, defaultValue }: { name: string; defaultValue:
           if (isHexColor(value)) setValue(value.toUpperCase());
           else setValue(defaultValue);
         }}
-        className="font-mono"
+        className="rounded-none bg-white font-mono dark:bg-white/10 dark:text-ink"
       />
       <input type="hidden" name={name} value={submitted} />
     </div>

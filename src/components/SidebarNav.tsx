@@ -61,7 +61,7 @@ function NavItem({
       )}
       aria-current={active ? "page" : undefined}
     >
-      <Icon size={18} className="shrink-0" />
+      <Icon size={18} className="shrink-0 stroke-current" />
       {!collapsed ? <span className="truncate">{label}</span> : null}
     </Link>
   );
@@ -99,7 +99,7 @@ export function SidebarNav({
     >
       <aside
         className={cn(
-          "flex h-full flex-col overflow-hidden rounded-[28px] bg-white py-5 text-ink shadow-card",
+          "surface-glass flex h-full flex-col overflow-hidden rounded-[28px] py-5 text-ink shadow-card",
           collapsed ? "items-center px-2" : "px-3.5",
         )}
       >
@@ -114,7 +114,7 @@ export function SidebarNav({
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-muted hover:bg-forest-soft hover:text-forest-ink"
               aria-label="Collapse navigation"
             >
-              <PanelLeftClose size={18} />
+              <PanelLeftClose size={18} className="stroke-current" />
             </button>
           ) : null}
         </div>
@@ -159,7 +159,7 @@ export function SidebarNav({
           : null}
       </nav>
 
-      <div className={cn("mt-4 flex shrink-0 flex-col gap-2.5 border-t border-outline-subtle/80 pt-4", collapsed && "items-center")}>
+        <div className={cn("mt-4 flex shrink-0 flex-col gap-2.5 border-t border-outline-subtle/80 pt-4 dark:border-white/10", collapsed && "items-center")}>
         {projectId ? (
           <NavItem
             href={`/projects/${projectId}/alerts`}
@@ -187,13 +187,13 @@ export function SidebarNav({
             collapsed ? "h-12 w-12 justify-center" : "h-12 w-full gap-3 px-3.5",
           )}
         >
-          <LogOut size={18} className="shrink-0" />
+          <LogOut size={18} className="shrink-0 stroke-current" />
           {!collapsed ? <span>Sign out</span> : null}
         </button>
         <Link
           href="/profile"
           title={userName}
-          className={cn("mt-3 flex items-center", collapsed ? "justify-center" : "gap-3 px-2")}
+          className={cn("flex items-center", collapsed ? "justify-center" : "gap-3 px-2")}
         >
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-forest text-label-sm text-white">
             {initials || "U"}
@@ -208,10 +208,10 @@ export function SidebarNav({
         <button
           type="button"
           onClick={onToggle}
-          className="absolute top-6 left-full ml-2 flex h-9 w-9 items-center justify-center rounded-full bg-white text-ink shadow-card hover:bg-forest-soft hover:text-forest-ink"
+          className="surface-glass absolute top-6 left-full ml-2 flex h-9 w-9 items-center justify-center rounded-full text-ink shadow-card hover:bg-forest-soft hover:text-forest-ink"
           aria-label="Expand navigation"
         >
-          <PanelLeft size={18} />
+          <PanelLeft size={18} className="stroke-current" />
         </button>
       ) : null}
     </div>

@@ -24,7 +24,7 @@ export default async function ReportsPage({
 
   return (
     <>
-      <form className="mb-6 grid gap-3 rounded-2xl bg-white p-4 text-ink shadow-card md:grid-cols-4">
+      <form className="surface-glass mb-6 grid gap-3 rounded-2xl p-4 text-ink shadow-card md:grid-cols-4">
         <Field label="Estate">
           <Select name="estateId" defaultValue={filters.estateId}>
             <option value="">All</option>
