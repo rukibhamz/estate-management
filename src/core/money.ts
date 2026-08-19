@@ -47,6 +47,17 @@ export function formatNaira(value: string | number) {
   }).format(Number(moneyString(value)));
 }
 
+export function formatNairaCompact(value: string | number) {
+  const n = Number(moneyString(value));
+  if (Math.abs(n) >= 1_000_000) {
+    return `₦${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1)}M`;
+  }
+  if (Math.abs(n) >= 1_000) {
+    return `₦${(n / 1_000).toFixed(0)}K`;
+  }
+  return formatNaira(value);
+}
+
 export function startOfTodayLagos(now = new Date()) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: TIMEZONE,

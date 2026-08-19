@@ -1,6 +1,5 @@
 import { requireUser } from "@/lib/guard";
 import { listAudit } from "@/server/dashboard";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardBody } from "@/components/ui/Card";
 
 export default async function AuditPage({
@@ -14,8 +13,7 @@ export default async function AuditPage({
 
   return (
     <>
-      <PageHeader eyebrow="Integrity" title="Audit history" description="Every state-changing action, scoped to your role." />
-      <div className="relative ml-3 border-l border-outline-subtle pl-6">
+      <div className="relative ml-3 border-l border-outline-subtle/70 pl-6">
         {logs.map((log) => (
           <Card key={log.id} className="mb-4">
             <CardBody>

@@ -166,6 +166,55 @@ async function main() {
     },
   });
 
+  const payDays = [1, 2, 3, 4];
+  for (const [index, weekday] of payDays.entries()) {
+    const date = new Date();
+    const current = date.getDay() || 7;
+    date.setDate(date.getDate() - (current - weekday));
+    date.setHours(10 + index, 15, 0, 0);
+    await prisma.paymentRecord.upsert({
+      where: { id: `seed-pay-${index + 1}` },
+      update: { amount: String(3_000_000 * (index + 1)), paymentDate: date },
+      create: {
+        id: `seed-pay-${index + 1}`,
+        projectId: project.id,
+        saleId: "seed-sale-1",
+        amount: String(3_000_000 * (index + 1)),
+        paymentDate: date,
+        method: "transfer",
+        recordedBy: owner.id,
+        editableUntil: new Date(Date.now() + 24 * 60 * 60 * 1000),
+      },
+    });
+  }
+
+  await prisma.spendRecord.upsert({
+    where: { id: "seed-spend-1" },
+    update: {},
+    create: {
+      id: "seed-spend-1",
+      projectId: project.id,
+      developmentId: development.id,
+      amount: "18000000.00",
+      date: new Date(),
+      category: "Construction",
+      createdBy: owner.id,
+    },
+  });
+  await prisma.spendRecord.upsert({
+    where: { id: "seed-spend-2" },
+    update: {},
+    create: {
+      id: "seed-spend-2",
+      projectId: project.id,
+      developmentId: development.id,
+      amount: "4200000.00",
+      date: new Date(),
+      category: "Consultants",
+      createdBy: owner.id,
+    },
+  });
+
   console.log("Seed complete. Login: owner@estateflow.dev / Password123!");
   console.log({ owner: owner.email, pm: pm.email, im: im.email, site: site.email, viewer: viewer.email });
 }

@@ -13,10 +13,10 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded bg-white border border-outline-subtle shadow-card",
-        accent === "blue" && "border-l-4 border-l-precision",
-        accent === "green" && "border-l-4 border-l-success",
-        accent === "amber" && "border-l-4 border-l-warning",
+        "rounded-2xl bg-white shadow-card",
+        accent === "blue" && "ring-1 ring-chart-blue/80",
+        accent === "green" && "ring-1 ring-forest-mint",
+        accent === "amber" && "ring-1 ring-chart-beige",
         className,
       )}
     >

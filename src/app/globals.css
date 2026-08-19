@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Rebuild token pass: forest green utilities */
+
 :root {
   color-scheme: light;
 }
@@ -12,8 +14,8 @@ body {
 }
 
 body {
-  background: #f8f9ff;
-  color: #191c20;
+  background: #f2f1ec;
+  color: #1a1c19;
 }
 
 summary::-webkit-details-marker {

@@ -1,6 +1,9 @@
+import { AppShell } from "@/components/AppShell";
 import { requireUser } from "@/lib/guard";
 
 export default async function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
-  await requireUser();
-  return children;
+  const user = await requireUser();
+  return (
+    <AppShell userName={user.name ?? user.email ?? "User"}>{children}</AppShell>
+  );
 }

@@ -1,12 +1,11 @@
 import { requireUser } from "@/lib/guard";
 import { listSales } from "@/server/sales";
 import { prisma } from "@/lib/prisma";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Field, Input, Select } from "@/components/ui/Field";
-import { formatNaira } from "@/core/money";
+import { formatNairaCompact } from "@/core/money";
 import {
   actionCreateBuyer,
   actionCreateSale,
@@ -30,11 +29,6 @@ export default async function SalesPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Commercial"
-        title="Sales & payments"
-        description="Reserve → allocate → collect. Overpayments are flagged, not rejected."
-      />
       <div className="mb-8 grid gap-4 lg:grid-cols-2">
         <Card>
           <CardBody>
@@ -109,9 +103,9 @@ export default async function SalesPage({
                   <p className="font-mono text-mono-data text-ink-muted">
                     {sale.unit?.unitRef ?? sale.land?.location ?? sale.id.slice(0, 8)}
                   </p>
-                  <p className="text-headline-md text-precision">{formatNaira(sale.agreedValue.toString())}</p>
+                  <p className="text-headline-md text-ink">{formatNairaCompact(sale.agreedValue.toString())}</p>
                   <p className="text-body-md text-ink-muted">
-                    Paid {formatNaira(sale.totalPaid.toString())}
+                    Paid {formatNairaCompact(sale.totalPaid.toString())}
                     {sale.isOverpaid ? " · overpaid" : ""}
                   </p>
                 </div>

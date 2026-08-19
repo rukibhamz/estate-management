@@ -1,13 +1,31 @@
 # EstateFlow — Phase Checklist
 
-Living build tracker. Design system: **Precision Executive** (Plus Jakarta Sans, Precision Blue `#031635`, surface `#f8f9ff`, 4px radius, container-first).
+Living build tracker. Design system: **Modern Minimalist** inspired by the attached property dashboard — cream canvas `#F2F1EC`, forest green `#1F6B4A`, icon rail, 24px cards, pill search, Plus Jakarta Sans.
 
-**Last updated:** 2026-08-19 19:07 — local `npm run dev` smoke-tested  
+**Last updated:** 2026-08-19 19:25 — UI fix: titles, charts, inner pages  
 **Stack:** Next.js 15 App Router · TypeScript · Tailwind · Prisma · SQLite (local) · Auth.js credentials  
 **Dev server:** http://localhost:3000  
 **Seed login:** `owner@estateflow.dev` / `Password123!`
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked
+
+---
+
+## Design refresh (this pass)
+
+Applied the attached dashboard mock to tokens, shell, and project home. Domain data stays EstateFlow (₦, units, allocations) — not a generic property-maintenance product.
+
+### Tasks
+- [x] Cream canvas, forest green, 24px radius, soft card shadow (no heavy borders)
+- [x] Full labeled sidebar, collapsible to the icon rail (persisted)
+- [x] Greeting header + pill search + message/bell
+- [x] KPI cards (Total Property / Number of Sales / Total Sales)
+- [x] Weekday sales bar chart + cost donut
+- [x] Last transactions + attention (overdue milestones)
+- [x] Re-seed payments/spend so charts have data
+- [x] Page titles live in the shell (no duplicate “Hello, Ada!” / H1 on inner pages)
+- [x] Sales bars use % height so they are not clipped; donut uses compact ₦
+- [x] Apply the same card/list density to Inventory, Developments, Sales, Reports
 
 ---
 
@@ -159,7 +177,7 @@ Not yet hit in this session: sales, documents, reports, team, audit, alerts, pro
 
 ## Phase 6 — Dashboards, Reporting, Notifications, Audit
 
-**Status:** `[x]` done (code); dashboard smoke-tested
+**Status:** `[x]` done — dashboard rebuilt to the attached mock
 
 ### Tasks
 - [x] Project dashboard KPIs (₦ financial display)
@@ -198,6 +216,7 @@ Not yet hit in this session: sales, documents, reports, team, audit, alerts, pro
 
 ## Open follow-ups
 
+- [ ] Restyle Inventory, Developments, Sales, Reports to the same card/list language as the dashboard
 - [ ] Playwright e2e: register → two projects → invite with different roles
 - [ ] Playwright RBAC isolation against real endpoints
 - [ ] Smoke remaining screens: Sales, Documents, Reports, Team, Audit, Alerts, Profile

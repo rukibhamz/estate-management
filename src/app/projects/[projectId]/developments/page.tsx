@@ -1,7 +1,6 @@
 import { requireUser } from "@/lib/guard";
 import { listDevelopments, varianceFor } from "@/server/developments";
 import { prisma } from "@/lib/prisma";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -30,11 +29,6 @@ export default async function DevelopmentsPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Construction"
-        title="Developments"
-        description="Weighted phase progress, spend vs budget, and two-step completion."
-      />
       <Card className="mb-8">
         <CardBody>
           <h2 className="mb-4 text-headline-md">New development</h2>
@@ -59,7 +53,7 @@ export default async function DevelopmentsPage({
               <Input name="approvedBudget" />
             </Field>
             <Field label="Land parcels">
-              <select name="landIds" multiple className="h-24 w-full rounded border border-outline-subtle p-2 text-body-md">
+              <select name="landIds" multiple className="h-24 w-full rounded-2xl bg-surface-low p-3 text-body-md outline-none focus:bg-white focus:ring-2 focus:ring-forest/20">
                 {lands.map((l) => (
                   <option key={l.id} value={l.id}>
                     {l.location ?? l.id.slice(0, 8)}
@@ -85,7 +79,7 @@ export default async function DevelopmentsPage({
               <CardBody>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <h2 className="text-headline-md text-precision">{dev.name}</h2>
+                    <h2 className="text-headline-md text-ink">{dev.name}</h2>
                     <p className="text-body-md text-ink-muted">
                       {dev.progressPct}% · {dev._count.units} units · lands {dev.lands.length}
                     </p>
@@ -95,8 +89,8 @@ export default async function DevelopmentsPage({
                     {variance.overall.isOverrun ? <Badge status="OVERDUE" /> : null}
                   </div>
                 </div>
-                <div className="mt-3 h-2 bg-surface-gray">
-                  <div className="h-full bg-success" style={{ width: `${dev.progressPct}%` }} />
+                <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-gray">
+                  <div className="h-full rounded-full bg-forest" style={{ width: `${dev.progressPct}%` }} />
                 </div>
                 <div className="mt-6 grid gap-4 lg:grid-cols-2">
                   <form action={actionAddPhase.bind(null, projectId, dev.id)} className="space-y-2">
@@ -122,7 +116,7 @@ export default async function DevelopmentsPage({
                 </div>
                 <ul className="mt-4 space-y-3">
                   {dev.phases.map((phase) => (
-                    <li key={phase.id} className="rounded border border-outline-subtle p-3">
+                    <li key={phase.id} className="rounded-2xl bg-surface-low p-3">
                       <div className="flex justify-between">
                         <span>{phase.name}</span>
                         <span className="font-mono text-mono-data">{phase.progressPct}%</span>

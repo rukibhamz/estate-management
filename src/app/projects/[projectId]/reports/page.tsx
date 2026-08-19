@@ -1,7 +1,6 @@
 import { requireUser } from "@/lib/guard";
 import { getSalesReport } from "@/server/dashboard";
 import { prisma } from "@/lib/prisma";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -25,8 +24,7 @@ export default async function ReportsPage({
 
   return (
     <>
-      <PageHeader eyebrow="Analytics" title="Reports" description="Filter sales by estate, asset type, and payment status." />
-      <form className="mb-6 grid gap-3 rounded border border-outline-subtle bg-white p-4 md:grid-cols-4">
+      <form className="mb-6 grid gap-3 rounded-2xl bg-white p-4 shadow-card md:grid-cols-4">
         <Field label="Estate">
           <Select name="estateId" defaultValue={filters.estateId}>
             <option value="">All</option>
@@ -61,7 +59,7 @@ export default async function ReportsPage({
       <Card>
         <CardBody className="overflow-x-auto p-0">
           <table className="w-full text-left text-body-md">
-            <thead className="border-b border-outline-subtle text-label-sm uppercase text-ink-muted">
+            <thead className="border-b border-outline-subtle/70 text-label-sm uppercase text-ink-muted">
               <tr>
                 <th className="px-4 py-3">Asset</th>
                 <th className="px-4 py-3">Buyer</th>
@@ -72,7 +70,7 @@ export default async function ReportsPage({
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={row.id} className="border-b border-outline-subtle last:border-0">
+                <tr key={row.id} className="border-b border-outline-subtle/50 last:border-0">
                   <td className="px-4 py-3 font-mono text-mono-data">
                     {row.unit?.unitRef ?? row.land?.location ?? "—"}
                   </td>

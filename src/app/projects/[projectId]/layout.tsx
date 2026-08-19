@@ -1,4 +1,3 @@
-import { AppShell } from "@/components/AppShell";
 import { requireUser } from "@/lib/guard";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
@@ -17,9 +16,5 @@ export default async function ProjectLayout({
   });
   if (!project) notFound();
 
-  return (
-    <AppShell userName={user.name ?? user.email ?? "User"} projectId={project.id} projectName={project.name}>
-      {children}
-    </AppShell>
-  );
+  return children;
 }

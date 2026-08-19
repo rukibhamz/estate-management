@@ -1,4 +1,6 @@
 import { Card, CardBody } from "./ui/Card";
+import { BrandMark } from "./BrandMark";
+import type { ReactNode } from "react";
 
 export function AuthFrame({
   title,
@@ -7,15 +9,18 @@ export function AuthFrame({
 }: {
   title: string;
   subtitle: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-surface px-4">
+    <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
       <div className="w-full max-w-md">
-        <p className="mb-6 text-center text-headline-md text-precision">EstateFlow</p>
+        <div className="mb-6 flex flex-col items-center text-forest">
+          <BrandMark className="h-10 w-10" />
+          <p className="mt-2 text-headline-md text-ink">EstateFlow</p>
+        </div>
         <Card>
           <CardBody>
-            <h1 className="text-headline-md text-precision">{title}</h1>
+            <h1 className="text-headline-md text-ink">{title}</h1>
             <p className="mb-6 mt-1 text-body-md text-ink-muted">{subtitle}</p>
             {children}
           </CardBody>

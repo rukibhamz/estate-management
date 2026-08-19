@@ -1,7 +1,6 @@
 import { requireUser } from "@/lib/guard";
 import { listDocuments } from "@/server/documents";
 import { signedDownloadPath } from "@/lib/storage";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Field, Input, Select, Textarea } from "@/components/ui/Field";
@@ -22,11 +21,6 @@ export default async function DocumentsPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Files"
-        title="Documents"
-        description="Stored privately. Downloads use short-lived signed URLs."
-      />
       <Card className="mb-8 max-w-xl">
         <CardBody>
           <form action={actionUploadDocument.bind(null, projectId)} className="space-y-3">
@@ -68,7 +62,7 @@ export default async function DocumentsPage({
                   {doc.linkedType} · {doc.category}
                 </p>
               </div>
-              <a className="text-body-md text-precision underline" href={signedDownloadPath(doc.fileKey)}>
+              <a className="text-body-md font-medium text-forest underline" href={signedDownloadPath(doc.fileKey)}>
                 Download
               </a>
             </CardBody>

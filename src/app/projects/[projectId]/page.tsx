@@ -1,11 +1,15 @@
 import { requireUser } from "@/lib/guard";
 import { getDashboard } from "@/server/dashboard";
-import { PageHeader } from "@/components/ui/PageHeader";
-import { StatCard } from "@/components/ui/StatCard";
+import { KpiCard } from "@/components/ui/StatCard";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { CostDonut, SalesBarChart } from "@/components/dashboard/Charts";
+import { formatNairaCompact } from "@/core/money";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import { AlertTriangle, Droplets, Zap, Wind } from "lucide-react";
+
+const ATTENTION_ICONS = [Droplets, Zap, Wind, AlertTriangle];
 
 export default async function ProjectDashboard({
   params,
@@ -17,66 +21,117 @@ export default async function ProjectDashboard({
   const project = await prisma.project.findUnique({ where: { id: projectId } });
   if (!project) notFound();
   const dash = await getDashboard(user.id, projectId);
+  const attention = dash.overdueMilestones.slice(0, 4);
 
   return (
-    <>
-      <PageHeader
-        eyebrow={project.location ?? "Project"}
-        title={project.name}
-        description={project.description ?? "Asset counts, construction progress, and collections."}
-      />
+    <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Total sales value" value={dash.salesSummary.agreed} money hint={`${dash.salesSummary.count} active allocations`} />
-        <StatCard label="Collected" value={dash.salesSummary.paid} money hint={`${dash.salesSummary.fullPayment} full · ${dash.salesSummary.partPayment} part`} />
-        <StatCard label="Outstanding" value={dash.salesSummary.outstanding} money hint={dash.salesSummary.overpaid ? `${dash.salesSummary.overpaid} overpaid` : "No overpayments"} />
+        <KpiCard
+          label="Total Property"
+          value={String(dash.totals.properties)}
+          hint={`${dash.totals.units} units · ${dash.totals.lands} land`}
+          icon="property"
+        />
+        <KpiCard
+          label="Number of Sales"
+          value={String(dash.salesSummary.count)}
+          hint={`${dash.salesSummary.partPayment} part · ${dash.salesSummary.fullPayment} full`}
+          icon="sales"
+        />
+        <KpiCard
+          label="Total Sales"
+          value={dash.salesSummary.agreed}
+          money
+          hint={`Collected ${formatNairaCompact(dash.salesSummary.paid)}`}
+          icon="value"
+        />
       </div>
-      <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardBody>
-            <h2 className="text-headline-md text-precision">Active developments</h2>
-            <div className="mt-4 space-y-4">
-              {dash.developments.length === 0 ? (
-                <p className="text-body-md text-ink-muted">No in-progress developments.</p>
-              ) : (
-                dash.developments.map((d) => (
-                  <div key={d.id}>
-                    <div className="mb-1 flex items-center justify-between">
-                      <span className="text-body-lg">{d.name}</span>
-                      <Badge status={d.status} />
-                    </div>
-                    <div className="h-2 overflow-hidden bg-surface-gray">
-                      <div className="h-full bg-success" style={{ width: `${d.progressPct}%` }} />
-                    </div>
-                    <p className="mt-1 font-mono text-mono-data text-ink-muted">{d.progressPct}% · spend {d.spend}</p>
-                  </div>
-                ))
-              )}
+
+      <div className="grid gap-4 xl:grid-cols-5">
+        <Card className="overflow-visible xl:col-span-3">
+          <CardBody className="overflow-visible">
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-headline-md text-ink">Report Sales</h2>
+              <span className="rounded-full bg-surface-low px-3 py-1 text-label-sm text-ink-muted">Weekday</span>
             </div>
+            <SalesBarChart series={dash.weeklySales} />
+          </CardBody>
+        </Card>
+        <Card className="xl:col-span-2">
+          <CardBody>
+            <h2 className="mb-6 text-headline-md text-ink">Cost Breakdown</h2>
+            <CostDonut slices={dash.costBreakdown} />
+          </CardBody>
+        </Card>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        <Card>
+          <CardBody>
+            <h2 className="mb-4 text-headline-md text-ink">Last Transactions</h2>
+            {dash.recentPayments.length === 0 ? (
+              <p className="text-body-md text-ink-muted">No payments recorded yet.</p>
+            ) : (
+              <ul className="divide-y divide-outline-subtle/60">
+                {dash.recentPayments.map((row) => (
+                  <li key={row.id} className="flex items-center justify-between gap-3 py-3">
+                    <div className="flex items-center gap-3">
+                      <span className="flex h-11 w-11 items-center justify-center rounded-full bg-forest-soft text-label-sm font-semibold text-forest">
+                        {row.label.slice(0, 2).toUpperCase()}
+                      </span>
+                      <div>
+                        <p className="text-body-lg text-ink">{row.label}</p>
+                        <p className="text-label-sm text-ink-muted">
+                          {row.dateLabel}
+                        </p>
+                      </div>
+                    </div>
+                    <p className="font-semibold text-forest">{formatNairaCompact(row.amount)}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
           </CardBody>
         </Card>
         <Card>
           <CardBody>
-            <h2 className="text-headline-md text-precision">Inventory</h2>
-            <ul className="mt-4 space-y-2 text-body-md">
-              {dash.unitCounts.map((row) => (
-                <li key={row.status} className="flex justify-between">
-                  <span className="text-ink-muted">{row.status}</span>
-                  <span className="font-mono text-mono-data">{row._count}</span>
-                </li>
-              ))}
-              {dash.landCounts.map((row) => (
-                <li key={`land-${row.status}`} className="flex justify-between">
-                  <span className="text-ink-muted">Land · {row.status}</span>
-                  <span className="font-mono text-mono-data">{row._count}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-6 text-label-sm uppercase text-ink-muted">
-              Overdue milestones · {dash.overdueMilestones.length}
-            </p>
+            <h2 className="mb-4 text-headline-md text-ink">Attention</h2>
+            {attention.length === 0 ? (
+              <div className="space-y-3">
+                {dash.developments.slice(0, 3).map((d) => (
+                  <div key={d.id} className="flex items-center justify-between rounded-2xl bg-surface-low px-3 py-3">
+                    <div>
+                      <p className="text-body-lg">{d.name}</p>
+                      <p className="text-label-sm text-ink-muted">{d.progressPct}% complete</p>
+                    </div>
+                    <Badge status={d.status} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <ul className="space-y-3">
+                {attention.map((item, index) => {
+                  const Icon = ATTENTION_ICONS[index % ATTENTION_ICONS.length];
+                  return (
+                    <li key={item.id} className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-full bg-surface-low text-forest">
+                          <Icon size={18} />
+                        </span>
+                        <div>
+                          <p className="text-body-lg">{item.description}</p>
+                          <p className="font-mono text-mono-data text-ink-muted">Overdue milestone</p>
+                        </div>
+                      </div>
+                      <Badge status="OVERDUE" />
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </CardBody>
         </Card>
       </div>
-    </>
+    </div>
   );
 }

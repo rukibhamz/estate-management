@@ -1,28 +1,21 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/guard";
 import { listProjects } from "@/server/projects";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { Button } from "@/components/ui/Button";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
-import { AppShell } from "@/components/AppShell";
 
 export default async function ProjectsPage() {
   const user = await requireUser();
   const projects = await listProjects(user.id);
 
   return (
-    <AppShell userName={user.name ?? user.email ?? "User"}>
-      <PageHeader
-        eyebrow="Workspace"
-        title="Projects"
-        description="Each project is an isolated tenancy. Roles do not leak across projects."
-        actions={
-          <Link href="/projects/new">
-            <Button>New project</Button>
-          </Link>
-        }
-      />
+    <>
+      <div className="mb-6 flex justify-end">
+        <Link href="/projects/new">
+          <Button>New project</Button>
+        </Link>
+      </div>
       {projects.length === 0 ? (
         <Card>
           <CardBody>
@@ -33,10 +26,10 @@ export default async function ProjectsPage() {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {projects.map((project) => (
             <Link key={project.id} href={`/projects/${project.id}`}>
-              <Card className="h-full transition hover:border-precision/30">
+              <Card className="h-full transition hover:shadow-modal">
                 <CardBody>
                   <div className="flex items-start justify-between gap-3">
-                    <h2 className="text-headline-md text-precision">{project.name}</h2>
+                    <h2 className="text-headline-md text-ink">{project.name}</h2>
                     <Badge status={project.status} />
                   </div>
                   <p className="mt-2 text-body-md text-ink-muted">{project.location ?? "No location"}</p>
@@ -49,6 +42,6 @@ export default async function ProjectsPage() {
           ))}
         </div>
       )}
-    </AppShell>
+    </>
   );
 }

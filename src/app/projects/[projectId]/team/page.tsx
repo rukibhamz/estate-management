@@ -1,6 +1,5 @@
 import { requireUser } from "@/lib/guard";
 import { prisma } from "@/lib/prisma";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -23,7 +22,6 @@ export default async function TeamPage({
 
   return (
     <>
-      <PageHeader eyebrow="Access" title="Team" description="Project-wide roles. Last Owner/Admin cannot be removed." />
       <Card className="mb-8 max-w-xl">
         <CardBody>
           <form action={actionInvite.bind(null, projectId)} className="space-y-3">

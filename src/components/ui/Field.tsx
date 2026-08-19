@@ -8,7 +8,7 @@ import type {
 } from "react";
 
 const field =
-  "w-full rounded border border-outline-subtle bg-white px-3 py-2 text-body-md text-ink outline-none transition focus:border-precision focus:ring-2 focus:ring-precision/20";
+  "w-full rounded-2xl border-0 bg-surface-low px-4 py-2.5 text-body-md text-ink outline-none transition focus:bg-white focus:ring-2 focus:ring-forest/20";
 
 export function Input({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
   return <input className={cn(field, className)} {...props} />;

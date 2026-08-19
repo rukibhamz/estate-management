@@ -1,6 +1,5 @@
 import { requireUser } from "@/lib/guard";
 import { evaluateAlerts } from "@/server/alerts";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -17,18 +16,13 @@ export default async function AlertsPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Watch"
-        title="Alerts"
-        description="Overdue milestones, budget overruns, and stale progress (7 days)."
-        actions={
-          <form action={actionRunAlerts.bind(null, projectId)}>
-            <Button type="submit" variant="secondary">
-              Re-evaluate
-            </Button>
-          </form>
-        }
-      />
+      <div className="mb-6 flex justify-end">
+        <form action={actionRunAlerts.bind(null, projectId)}>
+          <Button type="submit" variant="secondary">
+            Re-evaluate
+          </Button>
+        </form>
+      </div>
       <div className="space-y-3">
         {alerts.length === 0 ? (
           <Card>

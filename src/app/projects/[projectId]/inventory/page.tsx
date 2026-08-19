@@ -1,6 +1,5 @@
 import { requireUser } from "@/lib/guard";
 import { loadProjectAssets } from "@/server/assets";
-import { PageHeader } from "@/components/ui/PageHeader";
 import { Card, CardBody } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -32,12 +31,7 @@ export default async function InventoryPage({
 
   return (
     <>
-      <PageHeader
-        eyebrow="Assets"
-        title="Inventory"
-        description="Estates, land parcels, optional buildings, and units. Building is never required."
-      />
-      <form className="mb-6 grid gap-3 rounded border border-outline-subtle bg-white p-4 md:grid-cols-4">
+      <form className="mb-6 grid gap-3 rounded-2xl bg-white p-4 shadow-card md:grid-cols-4">
         <Field label="Estate">
           <Select name="estateId" defaultValue={filters.estateId}>
             <option value="">All</option>
@@ -83,7 +77,7 @@ export default async function InventoryPage({
             </form>
           </CardBody>
         </Card>
-        <Card accent="blue">
+        <Card>
           <CardBody>
             <h2 className="mb-4 text-headline-md">Add land</h2>
             <form action={actionCreateLand.bind(null, projectId)} className="space-y-3">
@@ -109,7 +103,7 @@ export default async function InventoryPage({
             </form>
           </CardBody>
         </Card>
-        <Card accent="green">
+        <Card>
           <CardBody>
             <h2 className="mb-4 text-headline-md">Add unit</h2>
             <form action={actionCreateUnit.bind(null, projectId)} className="space-y-3">
@@ -149,7 +143,7 @@ export default async function InventoryPage({
 
       <div className="mt-8 grid gap-4 md:hidden">
         {filtered.map((unit) => (
-          <Card key={unit.id} accent="green">
+          <Card key={unit.id}>
             <CardBody>
               <div className="flex justify-between">
                 <p className="font-mono text-mono-data">{unit.unitRef}</p>
@@ -161,9 +155,9 @@ export default async function InventoryPage({
         ))}
       </div>
 
-      <div className="mt-8 hidden overflow-x-auto rounded border border-outline-subtle bg-white md:block">
+      <div className="mt-8 hidden overflow-x-auto rounded-2xl bg-white shadow-card md:block">
         <table className="w-full text-left text-body-md">
-          <thead className="border-b border-outline-subtle text-label-sm uppercase text-ink-muted">
+          <thead className="border-b border-outline-subtle/70 text-label-sm uppercase text-ink-muted">
             <tr>
               <th className="px-4 py-3">Ref</th>
               <th className="px-4 py-3">Estate</th>
@@ -174,7 +168,7 @@ export default async function InventoryPage({
           </thead>
           <tbody>
             {filtered.map((unit) => (
-              <tr key={unit.id} className="border-b border-outline-subtle last:border-0">
+              <tr key={unit.id} className="border-b border-outline-subtle/50 last:border-0">
                 <td className="px-4 py-3 font-mono text-mono-data">{unit.unitRef}</td>
                 <td className="px-4 py-3">{unit.estate?.name ?? "—"}</td>
                 <td className="px-4 py-3">{unit.type ?? "—"}</td>
@@ -205,7 +199,7 @@ export default async function InventoryPage({
         <h2 className="mb-3 text-headline-md">Land parcels</h2>
         <div className="grid gap-3 md:grid-cols-2">
           {lands.map((land) => (
-            <Card key={land.id} accent="blue">
+            <Card key={land.id}>
               <CardBody>
                 <div className="flex justify-between">
                   <p>{land.location ?? land.id.slice(0, 8)}</p>

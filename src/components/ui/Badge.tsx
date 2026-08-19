@@ -7,8 +7,8 @@ const TONES: Record<string, string> = {
   COMPLETE: "bg-success/10 text-success-on",
   DONE: "bg-success/10 text-success-on",
   FULL_PAYMENT: "bg-success/10 text-success-on",
-  ALLOCATED: "bg-precision/10 text-precision",
-  IN_PROGRESS: "bg-precision/10 text-precision",
+  ALLOCATED: "bg-forest-soft text-forest",
+  IN_PROGRESS: "bg-forest-soft text-forest",
   RESERVED: "bg-warning/10 text-warning-on",
   DELAYED: "bg-warning/10 text-warning-on",
   PART_PAYMENT: "bg-warning/10 text-warning-on",
@@ -28,7 +28,7 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-lg px-2 py-0.5 text-label-sm uppercase",
+        "inline-flex items-center rounded-full px-2.5 py-0.5 text-label-sm",
         TONES[status] ?? "bg-surface-low text-ink-muted",
         className,
       )}
