@@ -114,23 +114,33 @@ export default async function SalesPage({
                   <Badge status={sale.paymentStatus} />
                 </div>
               </div>
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
-                <form action={actionTransitionSale.bind(null, projectId, sale.id)} className="flex flex-wrap gap-2">
-                  <Select name="status" defaultValue={sale.commercialStatus} className="w-auto">
+              <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                <form
+                  action={actionTransitionSale.bind(null, projectId, sale.id)}
+                  className="space-y-3 rounded-2xl bg-black/[0.03] p-4 ring-1 ring-black/[0.06] dark:bg-white/[0.05] dark:ring-white/12"
+                >
+                  <p className="text-label-sm uppercase tracking-wide text-ink-muted">Update status</p>
+                  <Select name="status" defaultValue={sale.commercialStatus}>
                     {["RESERVED", "ALLOCATED", "SOLD", "CANCELLED"].map((s) => (
                       <option key={s}>{s}</option>
                     ))}
                   </Select>
-                  <Input name="reason" placeholder="Reason if sold/cancel" className="max-w-xs" />
+                  <Input name="reason" placeholder="Reason if sold or cancelled" />
                   <Button size="sm" variant="secondary" type="submit">
                     Update status
                   </Button>
                 </form>
-                <form action={actionRecordPayment.bind(null, projectId)} className="flex flex-wrap gap-2">
+                <form
+                  action={actionRecordPayment.bind(null, projectId)}
+                  className="space-y-3 rounded-2xl bg-black/[0.03] p-4 ring-1 ring-black/[0.06] dark:bg-white/[0.05] dark:ring-white/12"
+                >
+                  <p className="text-label-sm uppercase tracking-wide text-ink-muted">Record payment</p>
                   <input type="hidden" name="saleId" value={sale.id} />
-                  <Input name="amount" placeholder="Amount (negative = refund)" className="max-w-[10rem]" />
-                  <Input name="paymentDate" type="date" required />
-                  <Input name="note" placeholder="Note" className="max-w-[10rem]" />
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <Input name="amount" placeholder="Amount (negative = refund)" />
+                    <Input name="paymentDate" type="date" required />
+                  </div>
+                  <Input name="note" placeholder="Note" />
                   <Button size="sm" type="submit">
                     Record
                   </Button>

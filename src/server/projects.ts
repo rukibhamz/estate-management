@@ -5,6 +5,7 @@ import { requireCapability, requireUser, writeAuditLog } from "@/lib/guard";
 import { AUDIT_ACTIONS } from "@/core/audit";
 import { ConflictError, DomainError, NotFoundError } from "@/core/errors";
 import type { ProjectRole } from "@/core/permissions";
+import { ensureTrialSubscription } from "@/server/platform";
 
 export async function registerUser(input: { name: string; email: string; password: string }) {
   const email = input.email.toLowerCase().trim();
@@ -14,6 +15,7 @@ export async function registerUser(input: { name: string; email: string; passwor
   const user = await prisma.user.create({
     data: { name: input.name.trim(), email, passwordHash },
   });
+  await ensureTrialSubscription(user.id);
   const pending = await prisma.projectMembership.findMany({
     where: { invitedEmail: email, userId: null, status: { in: ["ACTIVE", "PENDING"] } },
   });

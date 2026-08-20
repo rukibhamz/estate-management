@@ -2,10 +2,10 @@
 
 Living build tracker. Design system: **warm modern** — sand canvas `#F4EDE3`, ivory paper cards, forest green `#1F6B4A`, Plus Jakarta Sans.
 
-**Last updated:** 2026-08-19 20:40 — frosted glass canvas; light/dark toggle between search and alerts  
+**Last updated:** 2026-08-20 09:50 — platform super admin; dark-mode forms/buttons; branding moved to `/admin`  
 **Stack:** Next.js 15 App Router · TypeScript · Tailwind · Prisma · SQLite (local) · Auth.js credentials  
 **Dev server:** http://localhost:3000  
-**Seed login:** `owner@estateflow.dev` / `Password123!`  
+**Seed login:** `owner@estateflow.dev` / `Password123!` (project) · `admin@estateflow.dev` / `Password123!` (platform)  
 **Seed project:** `seed-project-1` (Lekki Waterside)
 
 Legend: `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked
@@ -40,12 +40,13 @@ Applied the property-dashboard mock, then warmed the palette and lifted cards so
 
 **Status:** `[x]` done (MVP)
 
-Install-wide branding for Owner/Admin; public landing inspired by the property-management marketing layout.
+Install-wide branding for **platform super admin**; public landing inspired by the property-management marketing layout.
 
 ### Tasks
-- [x] `SystemBranding` model + `/settings/branding` (name, logo, favicon, brand/canvas/ink)
+- [x] `SystemBranding` model + `/admin/branding` (name, logo, favicon, brand/canvas/ink)
 - [x] Theme CSS variables injected in root layout; favicon/logo via `/api/branding/*`
-- [x] Sidebar **Branding** link gated to Owner/Admin
+- [x] Sidebar **Platform / Users / Plans / Branding** gated to `User.isPlatformAdmin`
+- [x] `/admin` overview, `/admin/users`, `/admin/subscriptions` (manual plans until billing provider)
 - [x] Alerts bell popup in the header (count badge, recent items, view all)
 - [x] Public landing: pill nav, laptop product mock, quote, metadata footer
 - [x] Landing nav: single logo on the left; Sign in as a pill button

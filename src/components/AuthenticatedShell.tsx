@@ -1,6 +1,6 @@
 import { AppShell } from "./AppShell";
 import { requireUser } from "@/lib/guard";
-import { isSystemAdmin } from "@/server/branding";
+import { isPlatformAdmin } from "@/server/platform";
 import type { ReactNode } from "react";
 
 export async function AuthenticatedShell({
@@ -16,7 +16,7 @@ export async function AuthenticatedShell({
   return (
     <AppShell
       userName={user.name ?? user.email ?? "User"}
-      isSystemAdmin={await isSystemAdmin(user.id)}
+      isSystemAdmin={await isPlatformAdmin(user.id)}
       projectId={projectId}
       projectName={projectName}
     >

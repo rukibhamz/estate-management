@@ -11,7 +11,9 @@ import * as sales from "@/server/sales";
 import { evaluateAlerts } from "@/server/alerts";
 import { uploadDocument } from "@/server/documents";
 import { updateSystemBranding } from "@/server/branding";
+import * as platform from "@/server/platform";
 import type { CommercialStatus, LinkedType, ProjectRole, UnitStatus } from "@prisma/client";
+import type { SubscriptionPlan, SubscriptionStatus } from "@/core/billing";
 
 function formString(form: FormData, key: string) {
   return String(form.get(key) ?? "").trim();
@@ -304,5 +306,28 @@ export async function actionUpdateBranding(form: FormData): Promise<void> {
     }),
   );
   revalidatePath("/", "layout");
+  revalidatePath("/admin/branding");
   revalidatePath("/settings/branding");
+}
+
+export async function actionSetPlatformAdmin(userId: string, form: FormData): Promise<void> {
+  const user = await requireUser();
+  await run(() => platform.setPlatformAdmin(user.id, userId, formString(form, "next") === "1"));
+  revalidatePath("/admin/users");
+  revalidatePath("/admin");
+}
+
+export async function actionUpdateSubscription(userId: string, form: FormData): Promise<void> {
+  const user = await requireUser();
+  await run(() =>
+    platform.updateSubscription(user.id, userId, {
+      plan: formString(form, "plan") as SubscriptionPlan,
+      status: formString(form, "status") as SubscriptionStatus,
+      seats: Number(formOpt(form, "seats") ?? "1"),
+      notes: formOpt(form, "notes"),
+    }),
+  );
+  revalidatePath("/admin/subscriptions");
+  revalidatePath("/admin/users");
+  revalidatePath("/admin");
 }

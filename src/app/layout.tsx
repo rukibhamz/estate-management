@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import { Providers } from "@/components/Providers";
 import { getSystemBranding, toPublicBranding } from "@/server/branding";
 import { DEFAULT_BRANDING, brandingCssVars, type PublicBranding } from "@/core/branding";
+import Script from "next/script";
 import { THEME_BOOTSTRAP_SCRIPT } from "@/lib/theme-script";
 import "./globals.css";
 
@@ -45,10 +46,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { public: branding, css } = await loadBranding();
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP_SCRIPT }} />
-      </head>
       <body className={`${plusJakarta.variable} ${jetbrains.variable} font-sans antialiased`} suppressHydrationWarning>
+        <Script id="theme-bootstrap" strategy="beforeInteractive">
+          {THEME_BOOTSTRAP_SCRIPT}
+        </Script>
         <style dangerouslySetInnerHTML={{ __html: css }} />
         <Providers branding={branding}>{children}</Providers>
       </body>

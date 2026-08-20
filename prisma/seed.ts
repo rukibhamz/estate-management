@@ -23,6 +23,17 @@ async function main() {
     users.push(user);
   }
 
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@estateflow.dev" },
+    update: { isPlatformAdmin: true },
+    create: {
+      email: "admin@estateflow.dev",
+      name: "Platform Admin",
+      passwordHash,
+      isPlatformAdmin: true,
+    },
+  });
+
   const [owner, pm, im, site, viewer] = users;
 
   const project = await prisma.project.upsert({
@@ -227,8 +238,40 @@ async function main() {
     },
   });
 
-  console.log("Seed complete. Login: owner@estateflow.dev / Password123!");
-  console.log({ owner: owner.email, pm: pm.email, im: im.email, site: site.email, viewer: viewer.email });
+  const periodEnd = new Date();
+  periodEnd.setMonth(periodEnd.getMonth() + 1);
+  const trialEnd = new Date();
+  trialEnd.setDate(trialEnd.getDate() + 14);
+
+  for (const user of users) {
+    await prisma.subscription.upsert({
+      where: { userId: user.id },
+      update: {},
+      create: {
+        userId: user.id,
+        plan: user.id === owner.id ? "PROFESSIONAL" : "TRIAL",
+        status: user.id === owner.id ? "ACTIVE" : "TRIALING",
+        seats: user.id === owner.id ? 8 : 1,
+        currentPeriodEnd: user.id === owner.id ? periodEnd : trialEnd,
+      },
+    });
+  }
+  await prisma.subscription.upsert({
+    where: { userId: admin.id },
+    update: { plan: "ENTERPRISE", status: "ACTIVE", seats: 50, currentPeriodEnd: periodEnd },
+    create: {
+      userId: admin.id,
+      plan: "ENTERPRISE",
+      status: "ACTIVE",
+      seats: 50,
+      currentPeriodEnd: periodEnd,
+    },
+  });
+
+  console.log("Seed complete.");
+  console.log("Project owner: owner@estateflow.dev / Password123!");
+  console.log("Platform admin: admin@estateflow.dev / Password123!");
+  console.log({ owner: owner.email, pm: pm.email, im: im.email, site: site.email, viewer: viewer.email, admin: admin.email });
 }
 
 main()

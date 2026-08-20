@@ -11,6 +11,7 @@ import {
   inferImageMime,
   type PublicBranding,
 } from "@/core/branding";
+import { isPlatformAdmin } from "@/server/platform";
 
 export const getSystemBranding = cache(async () => {
   const existing = await prisma.systemBranding.findUnique({ where: { id: BRANDING_ID } });
@@ -34,16 +35,12 @@ export function toPublicBranding(row: Awaited<ReturnType<typeof getSystemBrandin
 }
 
 export async function isSystemAdmin(userId: string) {
-  const row = await prisma.projectMembership.findFirst({
-    where: { userId, status: "ACTIVE", role: "OWNER_ADMIN" },
-    select: { id: true },
-  });
-  return Boolean(row);
+  return isPlatformAdmin(userId);
 }
 
 export async function requireSystemAdmin(userId: string) {
-  if (!(await isSystemAdmin(userId))) {
-    throw new ForbiddenError("Only an Owner/Admin can change system branding.");
+  if (!(await isPlatformAdmin(userId))) {
+    throw new ForbiddenError("Only a platform super admin can change system branding.");
   }
 }
 

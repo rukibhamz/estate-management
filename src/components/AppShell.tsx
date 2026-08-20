@@ -27,6 +27,8 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   new: { title: "New project", subtitle: "You become the Owner/Admin." },
   profile: { title: "Profile", subtitle: "Your name and password." },
   branding: { title: "Branding", subtitle: "Workspace name, logo, favicon, and theme colors." },
+  users: { title: "Users", subtitle: "Signups and platform super admins." },
+  subscriptions: { title: "Subscriptions", subtitle: "Plans, seats, and account status." },
 };
 
 function headerCopy(pathname: string, firstName: string, projectId?: string, projectName?: string) {
@@ -42,6 +44,9 @@ function headerCopy(pathname: string, firstName: string, projectId?: string, pro
         ? `Explore information and activity about ${projectName}.`
         : "Explore information and activity about your property.",
     };
+  }
+  if (pathname === "/admin" || pathname === "/admin/") {
+    return { title: "Platform", subtitle: "Signups, subscriptions, and workspace branding." };
   }
   const key = pathname.split("/").filter(Boolean).at(-1) ?? "";
   return PAGE_TITLES[key] ?? { title: `Hello, ${firstName}!`, subtitle: "" };
@@ -149,7 +154,7 @@ export function AppShell({
                 <input
                   name="unitRef"
                   placeholder="Search Anything..."
-                  className="surface-glass h-12 w-full rounded-full py-2 pl-5 pr-14 text-body-md text-ink shadow-card outline-none placeholder:text-ink-muted"
+                  className="header-search surface-glass h-12 w-full rounded-full py-2 pl-5 pr-14 text-body-md text-ink shadow-card outline-none placeholder:text-ink-muted"
                 />
                 <button
                   type="submit"
@@ -192,9 +197,20 @@ function MobileNav({ projectId, isSystemAdmin }: { projectId?: string; isSystemA
             ))
           : null}
         {isSystemAdmin ? (
-          <Link href="/settings/branding" className="block rounded-xl px-3 py-2 text-body-md text-ink">
-            Branding
-          </Link>
+          <>
+            <Link href="/admin" className="block rounded-xl px-3 py-2 text-body-md text-ink">
+              Platform
+            </Link>
+            <Link href="/admin/users" className="block rounded-xl px-3 py-2 text-body-md text-ink">
+              Users
+            </Link>
+            <Link href="/admin/subscriptions" className="block rounded-xl px-3 py-2 text-body-md text-ink">
+              Plans
+            </Link>
+            <Link href="/admin/branding" className="block rounded-xl px-3 py-2 text-body-md text-ink">
+              Branding
+            </Link>
+          </>
         ) : null}
       </div>
     </details>

@@ -10,6 +10,7 @@ import {
   Handshake,
   FileText,
   Users,
+  UserCog,
   ScrollText,
   Bell,
   BarChart3,
@@ -17,10 +18,19 @@ import {
   FolderKanban,
   PanelLeft,
   PanelLeftClose,
+  CreditCard,
+  Shield,
   Palette,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { BrandLogo } from "./BrandLogo";
+
+const PLATFORM_NAV = [
+  { href: "/admin", label: "Platform", icon: Shield, match: "exact" as const },
+  { href: "/admin/users", label: "Users", icon: UserCog, match: "prefix" as const },
+  { href: "/admin/subscriptions", label: "Plans", icon: CreditCard, match: "prefix" as const },
+  { href: "/admin/branding", label: "Branding", icon: Palette, match: "prefix" as const },
+];
 
 const PROJECT_NAV = [
   { href: (id: string) => `/projects/${id}/inventory`, label: "Inventory", icon: Landmark, match: "prefix" as const },
@@ -126,13 +136,6 @@ export function SidebarNav({
       ) : null}
 
       <nav className={cn("flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto pr-1", collapsed && "items-center")}>
-        <NavItem
-          href="/projects"
-          label="Projects"
-          icon={FolderKanban}
-          collapsed={collapsed}
-          active={pathname === "/projects" || pathname === "/projects/new"}
-        />
         {projectId ? (
           <NavItem
             href={`/projects/${projectId}`}
@@ -142,6 +145,13 @@ export function SidebarNav({
             active={pathname === `/projects/${projectId}` || pathname === `/projects/${projectId}/`}
           />
         ) : null}
+        <NavItem
+          href="/projects"
+          label="Projects"
+          icon={FolderKanban}
+          collapsed={collapsed}
+          active={pathname === "/projects" || pathname === "/projects/new"}
+        />
         {projectId
           ? PROJECT_NAV.map((item) => {
               const href = item.href(projectId);
@@ -169,15 +179,22 @@ export function SidebarNav({
             active={pathname.includes("/alerts")}
           />
         ) : null}
-        {isSystemAdmin ? (
-          <NavItem
-            href="/settings/branding"
-            label="Branding"
-            icon={Palette}
-            collapsed={collapsed}
-            active={pathname.startsWith("/settings")}
-          />
-        ) : null}
+        {isSystemAdmin
+          ? PLATFORM_NAV.map((item) => (
+              <NavItem
+                key={item.label}
+                href={item.href}
+                label={item.label}
+                icon={item.icon}
+                collapsed={collapsed}
+                active={
+                  item.match === "exact"
+                    ? pathname === item.href || pathname === `${item.href}/`
+                    : isActive(pathname, item.href, item.match)
+                }
+              />
+            ))
+          : null}
         <button
           type="button"
           title="Sign out"
