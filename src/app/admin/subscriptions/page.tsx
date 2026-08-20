@@ -27,8 +27,10 @@ export default async function AdminSubscriptionsPage() {
             <CardBody className="space-y-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="text-headline-md text-ink">{row.user.name}</p>
-                  <p className="font-mono text-mono-data text-ink-muted">{row.user.email}</p>
+                  <p className="text-headline-md text-ink">{row.organization.name}</p>
+                  <p className="text-label-sm text-ink-muted">
+                    {labelize(row.organization.type)} · {row.organization._count.members} members
+                  </p>
                   <p className="mt-1 text-label-sm text-ink-muted">
                     Started {formatLagosDateTime(row.startedAt)}
                     {row.currentPeriodEnd ? ` · period ends ${formatLagosDateTime(row.currentPeriodEnd)}` : ""}
@@ -39,7 +41,7 @@ export default async function AdminSubscriptionsPage() {
                   <span className="text-label-sm text-ink-muted">{labelize(row.plan)}</span>
                 </div>
               </div>
-              <form action={actionUpdateSubscription.bind(null, row.userId)} className="grid gap-3 md:grid-cols-4">
+              <form action={actionUpdateSubscription.bind(null, row.organizationId)} className="grid gap-3 md:grid-cols-4">
                 <Field label="Plan">
                   <Select name="plan" defaultValue={row.plan}>
                     {SUBSCRIPTION_PLANS.map((plan) => (

@@ -127,6 +127,19 @@ enum SubscriptionStatus {
   CANCELED
 }
 
+enum OrganizationType {
+  COMPANY
+  INDIVIDUAL
+}
+
+enum TenantRole {
+  OWNER
+  ADMIN
+  MEMBER
+  CUSTOMER
+  VIEWER
+}
+
 model User {
   id               String   @id @default(cuid())
   email            String   @unique
@@ -137,10 +150,58 @@ model User {
   updatedAt        DateTime @updatedAt
 
   memberships          ProjectMembership[]
-  ownedProjects        Project[]            @relation("ProjectOwner")
+  ownedProjects        Project[]                 @relation("ProjectOwner")
   passwordResetTokens  PasswordResetToken[]
-  recordedPayments     PaymentRecord[]      @relation("PaymentRecorder")
-  subscription         Subscription?
+  recordedPayments     PaymentRecord[]           @relation("PaymentRecorder")
+  organizationMembers  OrganizationMembership[]
+  sentOrgInvites       OrganizationInvitation[]  @relation("OrgInviteSender")
+}
+
+model Organization {
+  id        String           @id @default(cuid())
+  name      String
+  type      OrganizationType @default(COMPANY)
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  members      OrganizationMembership[]
+  invitations  OrganizationInvitation[]
+  projects     Project[]
+  subscription Subscription?
+
+  @@index([name])
+}
+
+model OrganizationMembership {
+  id             String           @id @default(cuid())
+  organizationId String
+  userId         String
+  role           TenantRole       @default(MEMBER)
+  status         MembershipStatus @default(ACTIVE)
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  user           User             @relation(fields: [userId], references: [id], onDelete: Restrict)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+}
+
+model OrganizationInvitation {
+  id             String           @id @default(cuid())
+  organizationId String
+  email          String
+  role           TenantRole       @default(MEMBER)
+  tokenHash      String           @unique
+  invitedById    String
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  organization   Organization     @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  invitedBy      User             @relation("OrgInviteSender", fields: [invitedById], references: [id], onDelete: Restrict)
+  createdAt      DateTime         @default(now())
+
+  @@index([organizationId, email])
+  @@index([email])
 }
 
 model PasswordResetToken {
@@ -157,8 +218,8 @@ model PasswordResetToken {
 
 model Subscription {
   id               String             @id @default(cuid())
-  userId           String             @unique
-  user             User               @relation(fields: [userId], references: [id], onDelete: Restrict)
+  organizationId   String             @unique
+  organization     Organization       @relation(fields: [organizationId], references: [id], onDelete: Restrict)
   plan             SubscriptionPlan   @default(TRIAL)
   status           SubscriptionStatus @default(TRIALING)
   seats            Int                @default(1)
@@ -170,9 +231,11 @@ model Subscription {
 }
 
 model Project {
-  id          String        @id @default(cuid())
-  ownerId     String
-  owner       User          @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  id             String        @id @default(cuid())
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Restrict)
+  ownerId        String
+  owner          User          @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Restrict)
   name        String
   description String?
   location    String?
@@ -200,6 +263,7 @@ model Project {
   payments        PaymentRecord[]
 
   @@index([ownerId])
+  @@index([organizationId])
   @@index([status])
 }
 
@@ -593,4 +657,18 @@ model SystemBranding {
   colorInk       String
   updatedAt      DateTime @updatedAt
   updatedBy      String?
+}
+
+model SystemEmailSettings {
+  id         String   @id @default("default")
+  enabled    Boolean  @default(false)
+  smtpHost   String?
+  smtpPort   Int      @default(587)
+  smtpSecure Boolean  @default(false)
+  smtpUser   String?
+  smtpPass   String?
+  fromEmail  String?
+  fromName   String?
+  updatedAt  DateTime @updatedAt
+  updatedBy  String?
 }

@@ -12,7 +12,9 @@ import { evaluateAlerts } from "@/server/alerts";
 import { uploadDocument } from "@/server/documents";
 import { updateSystemBranding } from "@/server/branding";
 import * as platform from "@/server/platform";
-import type { CommercialStatus, LinkedType, ProjectRole, UnitStatus } from "@prisma/client";
+import * as organizations from "@/server/organizations";
+import { updateEmailSettings, sendTestEmail } from "@/server/email";
+import type { CommercialStatus, LinkedType, ProjectRole, TenantRole, UnitStatus } from "@prisma/client";
 import type { SubscriptionPlan, SubscriptionStatus } from "@/core/billing";
 
 function formString(form: FormData, key: string) {
@@ -39,6 +41,8 @@ export async function actionRegister(form: FormData): Promise<void> {
       name: formString(form, "name"),
       email: formString(form, "email"),
       password: formString(form, "password"),
+      organizationName: formString(form, "organizationName"),
+      organizationType: formString(form, "organizationType") === "INDIVIDUAL" ? "INDIVIDUAL" : "COMPANY",
     }),
   );
   redirect("/login");
@@ -46,6 +50,7 @@ export async function actionRegister(form: FormData): Promise<void> {
 
 export async function actionRequestReset(form: FormData): Promise<void> {
   await projects.requestPasswordReset(formString(form, "email"));
+  redirect("/forgot-password?sent=1");
 }
 
 export async function actionResetPassword(form: FormData): Promise<void> {
@@ -313,14 +318,14 @@ export async function actionUpdateBranding(form: FormData): Promise<void> {
 export async function actionSetPlatformAdmin(userId: string, form: FormData): Promise<void> {
   const user = await requireUser();
   await run(() => platform.setPlatformAdmin(user.id, userId, formString(form, "next") === "1"));
-  revalidatePath("/admin/users");
+  revalidatePath("/admin/organizations");
   revalidatePath("/admin");
 }
 
-export async function actionUpdateSubscription(userId: string, form: FormData): Promise<void> {
+export async function actionUpdateSubscription(organizationId: string, form: FormData): Promise<void> {
   const user = await requireUser();
   await run(() =>
-    platform.updateSubscription(user.id, userId, {
+    platform.updateSubscription(user.id, organizationId, {
       plan: formString(form, "plan") as SubscriptionPlan,
       status: formString(form, "status") as SubscriptionStatus,
       seats: Number(formOpt(form, "seats") ?? "1"),
@@ -328,6 +333,75 @@ export async function actionUpdateSubscription(userId: string, form: FormData): 
     }),
   );
   revalidatePath("/admin/subscriptions");
-  revalidatePath("/admin/users");
+  revalidatePath("/admin/organizations");
   revalidatePath("/admin");
+}
+
+export async function actionUpdateEmailSettings(form: FormData): Promise<void> {
+  const user = await requireUser();
+  await run(async () => {
+    await platform.requirePlatformAdmin(user.id);
+    await updateEmailSettings(user.id, {
+      enabled: formString(form, "enabled") === "1",
+      smtpHost: formOpt(form, "smtpHost"),
+      smtpPort: Number(formOpt(form, "smtpPort") ?? "587"),
+      smtpSecure: formString(form, "smtpSecure") === "1",
+      smtpUser: formOpt(form, "smtpUser"),
+      smtpPass: formOpt(form, "smtpPass"),
+      fromEmail: formOpt(form, "fromEmail"),
+      fromName: formOpt(form, "fromName"),
+    });
+  });
+  revalidatePath("/admin/email");
+}
+
+export async function actionSendTestEmail(): Promise<void> {
+  const user = await requireUser();
+  await run(async () => {
+    await platform.requirePlatformAdmin(user.id);
+    if (!user.email) throw new Error("Your account has no email address.");
+    await sendTestEmail(user.email);
+  });
+}
+
+export async function actionInviteOrganizationMember(organizationId: string, form: FormData): Promise<void> {
+  const user = await requireUser();
+  await run(() =>
+    organizations.inviteOrganizationMember(user.id, organizationId, {
+      email: formString(form, "email"),
+      role: formString(form, "role") as TenantRole,
+    }),
+  );
+  revalidatePath("/workspace/team");
+}
+
+export async function actionChangeOrganizationMemberRole(
+  organizationId: string,
+  membershipId: string,
+  form: FormData,
+): Promise<void> {
+  const user = await requireUser();
+  await run(() =>
+    organizations.changeOrganizationMemberRole(
+      user.id,
+      organizationId,
+      membershipId,
+      formString(form, "role") as TenantRole,
+    ),
+  );
+  revalidatePath("/workspace/team");
+}
+
+export async function actionRemoveOrganizationMember(organizationId: string, membershipId: string): Promise<void> {
+  const user = await requireUser();
+  await run(() => organizations.removeOrganizationMember(user.id, organizationId, membershipId));
+  revalidatePath("/workspace/team");
+}
+
+export async function acceptOrganizationInviteAction(form: FormData): Promise<void> {
+  const user = await requireUser();
+  await run(async () => {
+    await organizations.acceptOrganizationInvite(formString(form, "token"), user.id);
+  });
+  redirect("/projects");
 }

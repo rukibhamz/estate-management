@@ -16,17 +16,17 @@ export async function requirePlatformAdmin(userId: string) {
   }
 }
 
-export async function ensureTrialSubscription(userId: string) {
-  const existing = await prisma.subscription.findUnique({ where: { userId } });
+export async function ensureTrialSubscription(organizationId: string) {
+  const existing = await prisma.subscription.findUnique({ where: { organizationId } });
   if (existing) return existing;
   const periodEnd = new Date();
   periodEnd.setDate(periodEnd.getDate() + 14);
   return prisma.subscription.create({
     data: {
-      userId,
+      organizationId,
       plan: "TRIAL",
       status: "TRIALING",
-      seats: 1,
+      seats: 5,
       currentPeriodEnd: periodEnd,
     },
   });
@@ -34,46 +34,44 @@ export async function ensureTrialSubscription(userId: string) {
 
 export async function getPlatformOverview(actorId: string) {
   await requirePlatformAdmin(actorId);
-  const [users, projects, activeSubs, trialSubs, canceled, latestUsers] = await Promise.all([
+  const [users, organizations, projects, activeSubs, trialSubs, canceled, latestOrgs] = await Promise.all([
     prisma.user.count(),
+    prisma.organization.count(),
     prisma.project.count(),
     prisma.subscription.count({ where: { status: "ACTIVE" } }),
     prisma.subscription.count({ where: { status: "TRIALING" } }),
     prisma.subscription.count({ where: { status: "CANCELED" } }),
-    prisma.user.findMany({
+    prisma.organization.findMany({
       orderBy: { createdAt: "desc" },
       take: 6,
-      include: { subscription: true, _count: { select: { memberships: true, ownedProjects: true } } },
+      include: {
+        subscription: true,
+        _count: { select: { members: true, projects: true } },
+        members: {
+          where: { role: "OWNER", status: "ACTIVE" },
+          take: 1,
+          include: { user: { select: { name: true, email: true } } },
+        },
+      },
     }),
   ]);
-  return { users, projects, activeSubs, trialSubs, canceled, latestUsers };
-}
-
-export async function listPlatformUsers(actorId: string, query?: string) {
-  await requirePlatformAdmin(actorId);
-  const q = query?.trim();
-  return prisma.user.findMany({
-    where: q
-      ? {
-          OR: [
-            { email: { contains: q } },
-            { name: { contains: q } },
-          ],
-        }
-      : undefined,
-    orderBy: { createdAt: "desc" },
-    include: {
-      subscription: true,
-      _count: { select: { memberships: true, ownedProjects: true } },
-    },
-  });
+  return { users, organizations, projects, activeSubs, trialSubs, canceled, latestOrgs };
 }
 
 export async function listSubscriptions(actorId: string) {
   await requirePlatformAdmin(actorId);
   return prisma.subscription.findMany({
     orderBy: { createdAt: "desc" },
-    include: { user: { select: { id: true, name: true, email: true, createdAt: true } } },
+    include: {
+      organization: {
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          _count: { select: { members: true } },
+        },
+      },
+    },
   });
 }
 
@@ -100,18 +98,18 @@ export async function setPlatformAdmin(actorId: string, userId: string, next: bo
 
 export async function updateSubscription(
   actorId: string,
-  userId: string,
+  organizationId: string,
   input: { plan: SubscriptionPlan; status: SubscriptionStatus; seats?: number; notes?: string },
 ) {
   await requirePlatformAdmin(actorId);
   if (!SUBSCRIPTION_PLANS.includes(input.plan)) throw new DomainError("Invalid plan", "BAD_PLAN");
   if (!SUBSCRIPTION_STATUSES.includes(input.status)) throw new DomainError("Invalid status", "BAD_STATUS");
   const seats = Math.max(1, input.seats ?? 1);
-  await ensureTrialSubscription(userId);
+  await ensureTrialSubscription(organizationId);
   const periodEnd = new Date();
   periodEnd.setMonth(periodEnd.getMonth() + 1);
   return prisma.subscription.update({
-    where: { userId },
+    where: { organizationId },
     data: {
       plan: input.plan,
       status: input.status,

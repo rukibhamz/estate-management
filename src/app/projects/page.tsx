@@ -32,7 +32,9 @@ export default async function ProjectsPage() {
                     <h2 className="text-headline-md text-ink">{project.name}</h2>
                     <Badge status={project.status} />
                   </div>
-                  <p className="mt-2 text-body-md text-ink-muted">{project.location ?? "No location"}</p>
+                  <p className="mt-2 text-body-md text-ink-muted">
+                    {project.organization.name} · {project.location ?? "No location"}
+                  </p>
                   <p className="mt-4 font-mono text-mono-data text-ink-muted">
                     {project._count.units} units · {project._count.lands} land · {project._count.sales} sales
                   </p>

@@ -27,8 +27,9 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   new: { title: "New project", subtitle: "You become the Owner/Admin." },
   profile: { title: "Profile", subtitle: "Your name and password." },
   branding: { title: "Branding", subtitle: "Workspace name, logo, favicon, and theme colors." },
-  users: { title: "Users", subtitle: "Signups and platform super admins." },
-  subscriptions: { title: "Subscriptions", subtitle: "Plans, seats, and account status." },
+  organizations: { title: "Organizations", subtitle: "Tenants, members, and shared licenses." },
+  email: { title: "Email", subtitle: "SMTP for password reset and invite messages." },
+  subscriptions: { title: "Subscriptions", subtitle: "Plans, seats, and tenant billing." },
 };
 
 function headerCopy(pathname: string, firstName: string, projectId?: string, projectName?: string) {
@@ -46,7 +47,10 @@ function headerCopy(pathname: string, firstName: string, projectId?: string, pro
     };
   }
   if (pathname === "/admin" || pathname === "/admin/") {
-    return { title: "Platform", subtitle: "Signups, subscriptions, and workspace branding." };
+    return { title: "Dashboard", subtitle: "Signups, subscriptions, and workspace branding." };
+  }
+  if (pathname.startsWith("/workspace")) {
+    return { title: "Workspace", subtitle: "Your organization, seats, and teammate invites." };
   }
   const key = pathname.split("/").filter(Boolean).at(-1) ?? "";
   return PAGE_TITLES[key] ?? { title: `Hello, ${firstName}!`, subtitle: "" };
@@ -69,12 +73,14 @@ export function AppShell({
   projectName,
   userName,
   isSystemAdmin = false,
+  memberProjectIds = [],
   children,
 }: {
   projectId?: string;
   projectName?: string;
   userName: string;
   isSystemAdmin?: boolean;
+  memberProjectIds?: string[];
   children: ReactNode;
 }) {
   const firstName = userName.split(" ")[0] || userName;
@@ -111,8 +117,20 @@ export function AppShell({
     }
   }, [projectId, pathProjectId, projectName]);
 
-  const resolvedProjectId = projectId ?? pathProjectId ?? savedProject?.id;
-  const resolvedProjectName = projectName ?? savedProject?.name;
+  const onAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
+  const savedProjectAllowed =
+    savedProject?.id && memberProjectIds.includes(savedProject.id) ? savedProject : null;
+  const pathProjectAllowed =
+    pathProjectId && memberProjectIds.includes(pathProjectId) ? pathProjectId : undefined;
+  const propProjectAllowed =
+    projectId && memberProjectIds.includes(projectId) ? projectId : undefined;
+
+  const resolvedProjectId = onAdminRoute
+    ? undefined
+    : propProjectAllowed ?? pathProjectAllowed ?? savedProjectAllowed?.id;
+  const resolvedProjectName = onAdminRoute
+    ? undefined
+    : projectName ?? (resolvedProjectId === savedProjectAllowed?.id ? savedProjectAllowed?.name : undefined);
   const copy = headerCopy(pathname, firstName, resolvedProjectId, resolvedProjectName);
 
   function toggle() {
@@ -130,6 +148,7 @@ export function AppShell({
         projectName={resolvedProjectName}
         userName={userName}
         isSystemAdmin={isSystemAdmin}
+        onAdminRoute={onAdminRoute}
         collapsed={collapsed}
         onToggle={toggle}
       />
@@ -144,7 +163,11 @@ export function AppShell({
                 <h1 className="truncate text-headline-lg text-ink">{copy.title}</h1>
                 {copy.subtitle ? <p className="mt-1 text-body-md text-ink-muted">{copy.subtitle}</p> : null}
               </div>
-              <MobileNav projectId={resolvedProjectId} isSystemAdmin={isSystemAdmin} />
+              <MobileNav
+                projectId={resolvedProjectId}
+                isSystemAdmin={isSystemAdmin}
+                onAdminRoute={onAdminRoute}
+              />
             </div>
             <div className="flex items-center gap-3">
               <form
@@ -175,17 +198,30 @@ export function AppShell({
   );
 }
 
-function MobileNav({ projectId, isSystemAdmin }: { projectId?: string; isSystemAdmin: boolean }) {
+function MobileNav({
+  projectId,
+  isSystemAdmin,
+  onAdminRoute,
+}: {
+  projectId?: string;
+  isSystemAdmin: boolean;
+  onAdminRoute: boolean;
+}) {
   return (
     <details className="relative md:hidden">
       <summary className={cn("surface-glass list-none cursor-pointer rounded-full px-4 py-2 text-body-md text-ink shadow-card")}>
         Menu
       </summary>
       <div className="surface-glass absolute right-0 z-30 mt-2 w-56 rounded-2xl p-2 text-ink shadow-modal">
+        {onAdminRoute && isSystemAdmin ? (
+          <Link href="/admin" className="block rounded-xl px-3 py-2 text-body-md text-ink">
+            Dashboard
+          </Link>
+        ) : null}
         <Link href="/projects" className="block rounded-xl px-3 py-2 text-body-md text-ink">
           Projects
         </Link>
-        {projectId
+        {!onAdminRoute && projectId
           ? MOBILE_NAV.map((item) => (
               <Link
                 key={item.label}
@@ -196,16 +232,26 @@ function MobileNav({ projectId, isSystemAdmin }: { projectId?: string; isSystemA
               </Link>
             ))
           : null}
+        {!onAdminRoute ? (
+          <Link href="/workspace/team" className="block rounded-xl px-3 py-2 text-body-md text-ink">
+            Workspace
+          </Link>
+        ) : null}
         {isSystemAdmin ? (
           <>
-            <Link href="/admin" className="block rounded-xl px-3 py-2 text-body-md text-ink">
-              Platform
-            </Link>
-            <Link href="/admin/users" className="block rounded-xl px-3 py-2 text-body-md text-ink">
-              Users
+            {!onAdminRoute ? (
+              <Link href="/admin" className="block rounded-xl px-3 py-2 text-body-md text-ink">
+                Platform
+              </Link>
+            ) : null}
+            <Link href="/admin/organizations" className="block rounded-xl px-3 py-2 text-body-md text-ink">
+              Organizations
             </Link>
             <Link href="/admin/subscriptions" className="block rounded-xl px-3 py-2 text-body-md text-ink">
               Plans
+            </Link>
+            <Link href="/admin/email" className="block rounded-xl px-3 py-2 text-body-md text-ink">
+              Email
             </Link>
             <Link href="/admin/branding" className="block rounded-xl px-3 py-2 text-body-md text-ink">
               Branding

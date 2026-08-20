@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { authSession } from "@/lib/guard";
+import { isPlatformAdmin } from "@/server/platform";
 import { redirect } from "next/navigation";
 import { BrandLogo, BrandName } from "@/components/BrandLogo";
 import { BrandMark } from "@/components/BrandMark";
 import { LaptopMockup } from "@/components/landing/LaptopMockup";
+import { PublicLayout } from "@/components/PublicLayout";
 
 const NAV = [
   { href: "#product", label: "Product" },
@@ -13,33 +15,36 @@ const NAV = [
 
 export default async function HomePage() {
   const session = await authSession();
-  if (session?.user) redirect("/projects");
+  if (session?.user) {
+    if (await isPlatformAdmin(session.user.id)) redirect("/admin");
+    redirect("/projects");
+  }
 
   return (
-    <div className="min-h-screen text-ink">
-      <header className="sticky top-0 z-40 bg-app">
-        <div className="mx-auto grid max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-6 pb-5 pt-8 lg:px-10">
-          <Link href="/" className="justify-self-start text-forest-ink">
+    <PublicLayout>
+      <header className="sticky top-0 z-40 border-b border-outline-subtle/40 bg-app/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-5 lg:px-10">
+          <Link href="/" className="shrink-0 text-forest-ink">
             <BrandLogo markClassName="h-8 w-8" />
           </Link>
-          <nav className="surface-glass hidden items-center gap-2 rounded-full p-1.5 shadow-card md:flex">
+          <nav className="surface-glass order-3 flex w-full items-center justify-center gap-2 rounded-full p-1.5 shadow-card md:order-none md:w-auto">
             {NAV.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="rounded-full px-5 py-2 text-body-md text-ink-muted transition hover:bg-forest-soft hover:text-ink"
+                className="rounded-full px-4 py-2 text-body-md text-ink-muted transition hover:bg-forest-soft hover:text-ink lg:px-5"
               >
                 {item.label}
               </a>
             ))}
             <Link
               href="/register"
-              className="rounded-full bg-forest px-5 py-2 text-body-md font-medium text-white"
+              className="hidden rounded-full bg-forest px-5 py-2 text-body-md font-medium text-white md:inline-flex"
             >
               Get started
             </Link>
           </nav>
-          <div className="flex items-center justify-end gap-3">
+          <div className="flex shrink-0 items-center gap-3">
             <Link
               href="/login"
               className="surface-glass rounded-full px-5 py-2 text-body-md font-medium text-ink shadow-card hover:bg-forest-soft"
@@ -117,7 +122,7 @@ export default async function HomePage() {
           </Link>
         </div>
       </footer>
-    </div>
+    </PublicLayout>
   );
 }
 

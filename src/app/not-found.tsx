@@ -1,7 +1,10 @@
+import { NotFoundView } from "@/components/NotFoundView";
+import { PublicLayout } from "@/components/PublicLayout";
+
 export default function NotFound() {
   return (
-    <div className="flex min-h-screen items-center justify-center">
-      <p className="text-headline-md text-ink">Not found</p>
-    </div>
+    <PublicLayout>
+      <NotFoundView />
+    </PublicLayout>
   );
 }

@@ -19,16 +19,17 @@ import {
   PanelLeft,
   PanelLeftClose,
   CreditCard,
-  Shield,
   Palette,
+  Mail,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { BrandLogo } from "./BrandLogo";
 
 const PLATFORM_NAV = [
-  { href: "/admin", label: "Platform", icon: Shield, match: "exact" as const },
-  { href: "/admin/users", label: "Users", icon: UserCog, match: "prefix" as const },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, match: "exact" as const },
+  { href: "/admin/organizations", label: "Organizations", icon: Building2, match: "prefix" as const },
   { href: "/admin/subscriptions", label: "Plans", icon: CreditCard, match: "prefix" as const },
+  { href: "/admin/email", label: "Email", icon: Mail, match: "prefix" as const },
   { href: "/admin/branding", label: "Branding", icon: Palette, match: "prefix" as const },
 ];
 
@@ -82,6 +83,7 @@ export function SidebarNav({
   projectName,
   userName,
   isSystemAdmin = false,
+  onAdminRoute = false,
   collapsed,
   onToggle,
 }: {
@@ -89,6 +91,7 @@ export function SidebarNav({
   projectName?: string;
   userName: string;
   isSystemAdmin?: boolean;
+  onAdminRoute?: boolean;
   collapsed: boolean;
   onToggle: () => void;
 }) {
@@ -136,7 +139,19 @@ export function SidebarNav({
       ) : null}
 
       <nav className={cn("flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto pr-1", collapsed && "items-center")}>
-        {projectId ? (
+        {onAdminRoute && isSystemAdmin
+          ? PLATFORM_NAV.filter((item) => item.href === "/admin").map((item) => (
+              <NavItem
+                key={item.label}
+                href={item.href}
+                label={item.label}
+                icon={item.icon}
+                collapsed={collapsed}
+                active={pathname === item.href || pathname === `${item.href}/`}
+              />
+            ))
+          : null}
+        {!onAdminRoute && projectId ? (
           <NavItem
             href={`/projects/${projectId}`}
             label="Dashboard"
@@ -152,7 +167,7 @@ export function SidebarNav({
           collapsed={collapsed}
           active={pathname === "/projects" || pathname === "/projects/new"}
         />
-        {projectId
+        {!onAdminRoute && projectId
           ? PROJECT_NAV.map((item) => {
               const href = item.href(projectId);
               return (
@@ -170,6 +185,15 @@ export function SidebarNav({
       </nav>
 
         <div className={cn("mt-4 flex shrink-0 flex-col gap-2.5 border-t border-outline-subtle/80 pt-4 dark:border-white/10", collapsed && "items-center")}>
+        {!onAdminRoute ? (
+          <NavItem
+            href="/workspace/team"
+            label="Workspace"
+            icon={UserCog}
+            collapsed={collapsed}
+            active={pathname.startsWith("/workspace")}
+          />
+        ) : null}
         {projectId ? (
           <NavItem
             href={`/projects/${projectId}/alerts`}
@@ -180,11 +204,11 @@ export function SidebarNav({
           />
         ) : null}
         {isSystemAdmin
-          ? PLATFORM_NAV.map((item) => (
+          ? PLATFORM_NAV.filter((item) => !onAdminRoute || item.href !== "/admin").map((item) => (
               <NavItem
                 key={item.label}
                 href={item.href}
-                label={item.label}
+                label={item.label === "Dashboard" ? "Platform" : item.label}
                 icon={item.icon}
                 collapsed={collapsed}
                 active={

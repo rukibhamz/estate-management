@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
@@ -21,7 +21,8 @@ export default function LoginPage() {
       setError("Invalid email or password");
       return;
     }
-    window.location.href = "/projects";
+    const session = await getSession();
+    window.location.href = session?.user?.isPlatformAdmin ? "/admin" : "/projects";
   }
 
   return (

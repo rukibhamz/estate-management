@@ -3,33 +3,25 @@ import crypto from "crypto";
 import { prisma } from "@/lib/prisma";
 import { requireCapability, requireUser, writeAuditLog } from "@/lib/guard";
 import { AUDIT_ACTIONS } from "@/core/audit";
-import { ConflictError, DomainError, NotFoundError } from "@/core/errors";
+import { ConflictError, DomainError, NotFoundError, ForbiddenError } from "@/core/errors";
 import type { ProjectRole } from "@/core/permissions";
-import { ensureTrialSubscription } from "@/server/platform";
+import { registerWithOrganization, getPrimaryOrganization, loadActiveOrgMembership } from "@/server/organizations";
+import { sendPasswordResetEmail } from "@/server/email";
+import type { OrganizationType } from "@prisma/client";
 
-export async function registerUser(input: { name: string; email: string; password: string }) {
-  const email = input.email.toLowerCase().trim();
-  const existing = await prisma.user.findUnique({ where: { email } });
-  if (existing) throw new ConflictError("Email already registered");
-  const passwordHash = await hash(input.password, 12);
-  const user = await prisma.user.create({
-    data: { name: input.name.trim(), email, passwordHash },
-  });
-  await ensureTrialSubscription(user.id);
-  const pending = await prisma.projectMembership.findMany({
-    where: { invitedEmail: email, userId: null, status: { in: ["ACTIVE", "PENDING"] } },
-  });
-  for (const invite of pending) {
-    await prisma.projectMembership.update({
-      where: { id: invite.id },
-      data: { userId: user.id, status: "ACTIVE" },
-    });
-  }
-  return user;
+export async function registerUser(input: {
+  name: string;
+  email: string;
+  password: string;
+  organizationName: string;
+  organizationType: OrganizationType;
+}) {
+  return registerWithOrganization(input);
 }
 
 export async function requestPasswordReset(email: string) {
-  const user = await prisma.user.findUnique({ where: { email: email.toLowerCase().trim() } });
+  const normalized = email.toLowerCase().trim();
+  const user = await prisma.user.findUnique({ where: { email: normalized } });
   if (!user) return;
   const token = crypto.randomBytes(32).toString("hex");
   const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
@@ -40,6 +32,7 @@ export async function requestPasswordReset(email: string) {
       expiresAt: new Date(Date.now() + 60 * 60 * 1000),
     },
   });
+  await sendPasswordResetEmail(user.email, token);
   return token;
 }
 
@@ -80,9 +73,14 @@ export async function createProject(userId: string, input: {
   location?: string;
   coverImage?: string;
 }) {
+  const org = await getPrimaryOrganization(userId);
+  if (!org) throw new ForbiddenError("Join or create an organization before creating projects.");
+  await loadActiveOrgMembership(userId, org.id);
+
   const project = await prisma.$transaction(async (tx) => {
     const created = await tx.project.create({
       data: {
+        organizationId: org.id,
         ownerId: userId,
         name: input.name.trim(),
         description: input.description,
@@ -146,10 +144,23 @@ export async function archiveProject(userId: string, projectId: string) {
 }
 
 export async function listProjects(userId: string) {
+  const orgIds = await prisma.organizationMembership.findMany({
+    where: { userId, status: "ACTIVE" },
+    select: { organizationId: true },
+  });
+  const ids = orgIds.map((row) => row.organizationId);
+  if (ids.length === 0) return [];
+
   return prisma.project.findMany({
-    where: { memberships: { some: { userId, status: "ACTIVE" } } },
+    where: {
+      organizationId: { in: ids },
+      memberships: { some: { userId, status: "ACTIVE" } },
+    },
     orderBy: { createdAt: "desc" },
-    include: { _count: { select: { units: true, lands: true, sales: true } } },
+    include: {
+      organization: { select: { id: true, name: true } },
+      _count: { select: { units: true, lands: true, sales: true } },
+    },
   });
 }
 

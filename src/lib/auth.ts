@@ -23,7 +23,12 @@ export const authOptions: NextAuthOptions = {
         if (!user) return null;
         const ok = await compare(password, user.passwordHash);
         if (!ok) return null;
-        return { id: user.id, email: user.email, name: user.name };
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          isPlatformAdmin: user.isPlatformAdmin,
+        };
       },
     }),
   ],
@@ -33,6 +38,7 @@ export const authOptions: NextAuthOptions = {
         token.sub = user.id;
         token.email = user.email;
         token.name = user.name;
+        token.isPlatformAdmin = user.isPlatformAdmin ?? false;
       }
       return token;
     },
@@ -41,6 +47,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = token.sub ?? "";
         session.user.email = (token.email as string) ?? "";
         session.user.name = (token.name as string) ?? "";
+        session.user.isPlatformAdmin = Boolean(token.isPlatformAdmin);
       }
       return session;
     },

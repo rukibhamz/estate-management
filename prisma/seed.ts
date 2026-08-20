@@ -36,11 +36,41 @@ async function main() {
 
   const [owner, pm, im, site, viewer] = users;
 
+  const organization = await prisma.organization.upsert({
+    where: { id: "seed-org-1" },
+    update: { name: "Lekki Waterside Ltd" },
+    create: {
+      id: "seed-org-1",
+      name: "Lekki Waterside Ltd",
+      type: "COMPANY",
+    },
+  });
+
+  const orgMembers = [
+    [owner.id, "OWNER"],
+    [pm.id, "ADMIN"],
+    [im.id, "MEMBER"],
+    [site.id, "MEMBER"],
+    [viewer.id, "VIEWER"],
+  ] as const;
+
+  for (const [userId, role] of orgMembers) {
+    const existing = await prisma.organizationMembership.findFirst({
+      where: { organizationId: organization.id, userId },
+    });
+    if (!existing) {
+      await prisma.organizationMembership.create({
+        data: { organizationId: organization.id, userId, role, status: "ACTIVE" },
+      });
+    }
+  }
+
   const project = await prisma.project.upsert({
     where: { id: "seed-project-1" },
-    update: {},
+    update: { organizationId: organization.id },
     create: {
       id: "seed-project-1",
+      organizationId: organization.id,
       ownerId: owner.id,
       name: "Lekki Waterside",
       location: "Lekki, Lagos",
@@ -238,29 +268,50 @@ async function main() {
     },
   });
 
+  await prisma.systemEmailSettings.upsert({
+    where: { id: "default" },
+    update: {},
+    create: { id: "default", enabled: false, smtpPort: 587, smtpSecure: false },
+  });
+
   const periodEnd = new Date();
   periodEnd.setMonth(periodEnd.getMonth() + 1);
   const trialEnd = new Date();
   trialEnd.setDate(trialEnd.getDate() + 14);
 
-  for (const user of users) {
-    await prisma.subscription.upsert({
-      where: { userId: user.id },
-      update: {},
-      create: {
-        userId: user.id,
-        plan: user.id === owner.id ? "PROFESSIONAL" : "TRIAL",
-        status: user.id === owner.id ? "ACTIVE" : "TRIALING",
-        seats: user.id === owner.id ? 8 : 1,
-        currentPeriodEnd: user.id === owner.id ? periodEnd : trialEnd,
-      },
-    });
-  }
   await prisma.subscription.upsert({
-    where: { userId: admin.id },
+    where: { organizationId: organization.id },
+    update: { plan: "PROFESSIONAL", status: "ACTIVE", seats: 8, currentPeriodEnd: periodEnd },
+    create: {
+      organizationId: organization.id,
+      plan: "PROFESSIONAL",
+      status: "ACTIVE",
+      seats: 8,
+      currentPeriodEnd: periodEnd,
+    },
+  });
+
+  const adminOrg = await prisma.organization.upsert({
+    where: { id: "seed-org-platform" },
+    update: {},
+    create: {
+      id: "seed-org-platform",
+      name: "Platform Operations",
+      type: "COMPANY",
+    },
+  });
+
+  await prisma.organizationMembership.upsert({
+    where: { organizationId_userId: { organizationId: adminOrg.id, userId: admin.id } },
+    update: { role: "OWNER", status: "ACTIVE" },
+    create: { organizationId: adminOrg.id, userId: admin.id, role: "OWNER", status: "ACTIVE" },
+  });
+
+  await prisma.subscription.upsert({
+    where: { organizationId: adminOrg.id },
     update: { plan: "ENTERPRISE", status: "ACTIVE", seats: 50, currentPeriodEnd: periodEnd },
     create: {
-      userId: admin.id,
+      organizationId: adminOrg.id,
       plan: "ENTERPRISE",
       status: "ACTIVE",
       seats: 50,
